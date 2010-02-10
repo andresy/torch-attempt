@@ -8,7 +8,7 @@
 
 typedef struct THStorage THStorage;
 
-extern const struct THMStorage
+extern const struct THStorageAPI
 {
   THStorage* (*alloc)();
 
@@ -24,5 +24,5 @@ extern const struct THMStorage
   
   void (*free)(THStorage*);
   
-} THMStorage;
+} THStorageAPI;
 

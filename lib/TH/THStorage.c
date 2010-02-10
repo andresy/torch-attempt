@@ -109,10 +109,9 @@ static struct THStorageVTable THStorage_vtable = {
 };
 
 /* mapped storages */
+#if defined(_WIN32) || defined(HAVE_MMAP)
 
 static struct THStorageVTable THMappedStorage_vtable;
-
-#if defined(_WIN32) || defined(HAVE_MMAP)
 
 static THStorage* THStorage_allocWithMapping(const char *filename, int isshared)
 {
@@ -224,16 +223,6 @@ static THStorage* THStorage_allocWithMapping(const char *filename, int isshared)
   return self;
 }
 
-#else
-
-static THStorage* THStorage_allocWithMapping(const char *filename, int isshared)
-{
-  THError("File mapped storages are not supported on your system");
-  return NULL;
-}
-
-#endif
-
 static void THMappedStorage_resize(THStorage *self, long size)
 {
   THError("File mapped storages cannot be resized");
@@ -253,6 +242,16 @@ static void THMappedStorage_free(THStorage *self)
   }
 #endif
 }
+
+#else
+
+static THStorage* THStorage_allocWithMapping(const char *filename, int isshared)
+{
+  THError("File mapped storages are not supported on your system");
+  return NULL;
+}
+
+#endif
 
 #if defined(_WIN32) || defined(HAVE_MMAP)
 
@@ -298,13 +297,13 @@ static void THStorage_vtable_free(THStorage *self)
   self->vtable->free(self);
 }
 
-const struct THMStorage THMStorage = {THStorage_alloc,
-                                      THStorage_allocWithSize,
-                                      THStorage_allocWithMapping,
-                                      THStorage_vtable_data,
-                                      THStorage_vtable_size,
-                                      THStorage_vtable_retain,
-                                      THStorage_vtable_copy,
-                                      THStorage_vtable_resize,
-                                      THStorage_vtable_free
+const struct THStorageAPI THStorageAPI = {THStorage_alloc,
+                                          THStorage_allocWithSize,
+                                          THStorage_allocWithMapping,
+                                          THStorage_vtable_data,
+                                          THStorage_vtable_size,
+                                          THStorage_vtable_retain,
+                                          THStorage_vtable_copy,
+                                          THStorage_vtable_resize,
+                                          THStorage_vtable_free
 };
