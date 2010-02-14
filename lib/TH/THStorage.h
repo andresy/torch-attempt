@@ -1,28 +1,26 @@
-/* ils appellent tous la vtable... THStorage est un module apres tout.
-   donc newMappedFile est dans le module. voila.
-   et les autres servent pour le polymorphisme.
-   donc en cas de sous classe (genre MappedStorage! on peut toujours utiliser ca)
-   c'est juste que le module sous-classe sera d'un nom different. logique. */
+#ifndef TH_STORAGE_INC
+#define TH_STORAGE_INC
 
 #include "THGeneral.h"
 
-typedef struct THStorage THStorage;
+/* stuff for mapped files */
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
-extern const struct THStorageAPI
-{
-  THStorage* (*alloc)();
+#if HAVE_MMAP
+#include <sys/types.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#endif
+/* end of stuff for mapped files */
 
-  THStorage* (*allocWithSize)(long);
-  THStorage* (*allocMappedFile)(const char*, int);
-  
-  real* (*data)(THStorage*);
-  long (*size)(THStorage*);
+#define THStorageAPI TH_CONCAT_3(TH,Real,StorageAPI)
+#define THStorage    TH_CONCAT_3(TH,Real,Storage)
 
-  void (*retain)(THStorage*);
-  void (*copy)(THStorage*, THStorage*);
-  void (*resize)(THStorage*, long);
-  
-  void (*free)(THStorage*);
-  
-} THStorageAPI;
+#define TH_GENERIC_FILE "THStorageGeneric.h"
+#include "THGenerateAllTypes.h"
 
+#endif

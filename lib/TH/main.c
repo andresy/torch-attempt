@@ -1,4 +1,4 @@
-#include "THStorages.h"
+#include "THStorage.h"
 
 int main()
 {

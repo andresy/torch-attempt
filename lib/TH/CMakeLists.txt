@@ -1,9 +1,22 @@
-SET(src
-  THGeneral.c
-  THByteStorage.c THCharTensor.c THShortStorage.c THIntStorage.c THLongStorage.c THFloatStorage.c THDoubleStorage.c
-  THByteTensor.c THCharStorage.c THShortTensor.c THIntTensor.c THLongTensor.c THFloatTensor.c THDoubleTensor.c)
+cmake_minimum_required(VERSION 2.6)
 
-ADD_LIBRARY(TH ${src})
+SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_MODULE_PATH})
+
+FIND_PACKAGE(LAPACK)
+
+SET(src
+  THGeneral.c THBlas.c THStorage.c THTensor.c THTensorMath.c)
+
+SET_SOURCE_FILES_PROPERTIES(THStorage.c PROPERTIES OBJECT_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/THStorageGeneric.h)
+
+ADD_LIBRARY(TH ${src} ${gen})
+
+IF(LAPACK_FOUND)
+  TARGET_LINK_LIBRARIES(TH ${LAPACK_LIBRARIES})
+  ADD_DEFINITIONS(-DUSE_LAPACK)
+  ADD_EXECUTABLE(test-lapack test-lapack.c)
+  TARGET_LINK_LIBRARIES(test-lapack ${LAPACK_LIBRARIES})
+ENDIF(LAPACK_FOUND)
 
 ADD_EXECUTABLE(main main.c)
 TARGET_LINK_LIBRARIES(main TH)
