@@ -1,7 +1,3 @@
-#ifndef TH_GENERIC_FILE
-#define TH_GENERIC_FILE "THStorageGeneric.c"
-#else
-
 /* on pourrait peut-etre mettre ca dans TH/dev/THStorage.h */
 struct THStorageVTable
 {
@@ -295,5 +291,3 @@ const struct THStorageAPI THStorageAPI = {THStorage_(alloc),
                                           THStorage_(vtable_resize),
                                           THStorage_(vtable_free)
 };
-
-#endif

@@ -1,3 +1,7 @@
+#ifndef TH_GENERIC_FILE
+#error "You must define TH_GENERIC_FILE before including THGenerateAllTypes.h"
+#endif
+
 #define real unsigned char
 #define Real Byte
 #define TH_REAL_IS_BYTE
