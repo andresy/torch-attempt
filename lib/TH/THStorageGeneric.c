@@ -1,3 +1,7 @@
+#ifndef TH_GENERIC_FILE
+#define TH_GENERIC_FILE "THStorageGeneric.c"
+#else
+
 /* on pourrait peut-etre mettre ca dans TH/dev/THStorage.h */
 struct THStorageVTable
 {
@@ -20,9 +24,9 @@ struct THStorage
 };
 
 /* normal storages */
-static struct THStorageVTable THStorage_(vtable);
+struct THStorageVTable THStorage_(vtable);
 
-static THStorage* THStorage_(alloc)()
+THStorage* THStorage_(alloc)()
 {
   THStorage *self = malloc(sizeof(THStorage));
   self->vtable = &THStorage_(vtable);
@@ -32,7 +36,7 @@ static THStorage* THStorage_(alloc)()
   return self;
 }
 
-static THStorage* THStorage_(allocWithSize)(long size)
+THStorage* THStorage_(allocWithSize)(long size)
 {
   THStorage *self = THStorage_(alloc)();
   self->size = size;
@@ -40,17 +44,17 @@ static THStorage* THStorage_(allocWithSize)(long size)
   return self;
 }
 
-static real* THStorage_(data)(THStorage *self)
+real* THStorage_(data)(THStorage *self)
 {
   return self->data;
 }
 
-static long THStorage_(size)(THStorage *self)
+long THStorage_(size)(THStorage *self)
 {
   return self->size;
 }
 
-static void THStorage_(resize)(THStorage *self, long size)
+void THStorage_(resize)(THStorage *self, long size)
 {
   if(size != self->size)
   {
@@ -59,7 +63,7 @@ static void THStorage_(resize)(THStorage *self, long size)
   }
 }
 
-static void THStorage_(copy)(THStorage *self, THStorage *storage)
+void THStorage_(copy)(THStorage *self, THStorage *storage)
 {
   int i;
 
@@ -69,12 +73,12 @@ static void THStorage_(copy)(THStorage *self, THStorage *storage)
     self->data[i] = self->data[i];
 }
 
-static void THStorage_(retain)(THStorage *self)
+void THStorage_(retain)(THStorage *self)
 {
   ++self->refcount;
 }
 
-static void THStorage_(free)(THStorage *self)
+void THStorage_(free)(THStorage *self)
 {
   if(--self->refcount == 0)
   {
@@ -83,7 +87,7 @@ static void THStorage_(free)(THStorage *self)
   }
 }
 
-static struct THStorageVTable THStorage_(vtable) = {
+struct THStorageVTable THStorage_(vtable) = {
   THStorage_(data),
   THStorage_(size),
   THStorage_(retain),
@@ -95,9 +99,9 @@ static struct THStorageVTable THStorage_(vtable) = {
 /* mapped storages */
 #if defined(_WIN32) || defined(HAVE_MMAP)
 
-static struct THStorageVTable THMappedStorage_(vtable);
+struct THStorageVTable THMappedStorage_(vtable);
 
-static THStorage* THStorage_(allocWithMapping)(const char *filename, int isshared)
+THStorage* THStorage_(allocWithMapping)(const char *filename, int isshared)
 {
   THStorage *self = malloc(sizeof(THStorage));
   long size;
@@ -207,12 +211,12 @@ static THStorage* THStorage_(allocWithMapping)(const char *filename, int isshare
   return self;
 }
 
-static void THMappedStorage_(resize)(THStorage *self, long size)
+void THMappedStorage_(resize)(THStorage *self, long size)
 {
   THError("File mapped storages cannot be resized");
 }
 
-static void THMappedStorage_(free)(THStorage *self)
+void THMappedStorage_(free)(THStorage *self)
 {
 #if defined(_WIN32) || defined(HAVE_MMAP)
   if(--self->refcount == 0)
@@ -229,7 +233,7 @@ static void THMappedStorage_(free)(THStorage *self)
 
 #else
 
-static THStorage* THStorage_(allocWithMapping)(const char *filename, int isshared)
+THStorage* THStorage_(allocWithMapping)(const char *filename, int isshared)
 {
   THError("File mapped storages are not supported on your system");
   return NULL;
@@ -239,7 +243,7 @@ static THStorage* THStorage_(allocWithMapping)(const char *filename, int isshare
 
 #if defined(_WIN32) || defined(HAVE_MMAP)
 
-static struct THStorageVTable THMappedStorage_(vtable) = {
+struct THStorageVTable THMappedStorage_(vtable) = {
   THStorage_(data),
   THStorage_(size),
   THStorage_(retain),
@@ -251,43 +255,34 @@ static struct THStorageVTable THMappedStorage_(vtable) = {
 #endif
 
 /* ze vtable */
-static real* THStorage_(vtable_data)(THStorage *self)
+real* THStorage_(vtable_data)(THStorage *self)
 {
   return self->vtable->data(self);
 }
 
-static long THStorage_(vtable_size)(THStorage *self)
+long THStorage_(vtable_size)(THStorage *self)
 {
   return self->vtable->size(self);
 }
 
-static void THStorage_(vtable_retain)(THStorage *self)
+void THStorage_(vtable_retain)(THStorage *self)
 {
   self->vtable->retain(self);
 }
 
-static void THStorage_(vtable_copy)(THStorage *self, THStorage *src)
+void THStorage_(vtable_copy)(THStorage *self, THStorage *src)
 {
   self->vtable->copy(self, src);
 }
 
-static void THStorage_(vtable_resize)(THStorage *self, long size)
+void THStorage_(vtable_resize)(THStorage *self, long size)
 {
   self->vtable->resize(self, size);
 }
 
-static void THStorage_(vtable_free)(THStorage *self)
+void THStorage_(vtable_free)(THStorage *self)
 {
   self->vtable->free(self);
 }
 
-const struct THStorageAPI THStorageAPI = {THStorage_(alloc),
-                                          THStorage_(allocWithSize),
-                                          THStorage_(allocWithMapping),
-                                          THStorage_(vtable_data),
-                                          THStorage_(vtable_size),
-                                          THStorage_(vtable_retain),
-                                          THStorage_(vtable_copy),
-                                          THStorage_(vtable_resize),
-                                          THStorage_(vtable_free)
-};
+#endif

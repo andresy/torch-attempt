@@ -2,14 +2,14 @@
 
 int main()
 {
-  THDoubleStorage *storaged = THDoubleStorageAPI.allocWithSize(10);
-  THFloatStorage *storagef = THFloatStorageAPI.allocWithSize(10);
+  THDoubleStorage *storaged = THDoubleStorage_allocWithSize(10);
+  THFloatStorage *storagef = THFloatStorage_allocWithSize(10);
 
-  THDoubleStorageAPI.resize(storaged, 100);
-  THDoubleStorageAPI.free(storaged);
+  THDoubleStorage_resize(storaged, 100);
+  THDoubleStorage_free(storaged);
 
-  THFloatStorageAPI.resize(storagef, 100);
-  THFloatStorageAPI.free(storagef);
+  THFloatStorage_resize(storagef, 100);
+  THFloatStorage_free(storagef);
 
   return 0;
 }

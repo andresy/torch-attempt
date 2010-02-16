@@ -17,10 +17,10 @@
 #endif
 /* end of stuff for mapped files */
 
-#define THStorageAPI TH_CONCAT_3(TH,Real,StorageAPI)
-#define THStorage    TH_CONCAT_3(TH,Real,Storage)
+#define THStorage        TH_CONCAT_3(TH,Real,Storage)
+#define THStorage_(NAME) TH_CONCAT_4(TH,Real,Storage_,NAME)
 
-#define TH_GENERIC_FILE "THStorageGeneric.h"
+#include "THStorageGeneric.h"
 #include "THGenerateAllTypes.h"
 
 #endif

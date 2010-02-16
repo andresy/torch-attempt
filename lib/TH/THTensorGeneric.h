@@ -1,63 +1,65 @@
+#ifndef TH_GENERIC_FILE
+#define TH_GENERIC_FILE "THTensorGeneric.h"
+#else
+
 typedef struct THTensor THTensor;
 
-extern const struct THTensorAPI
-{
-  THTensor* (*alloc)();
+THTensor* THTensor_(alloc)();
 
-  THTensor* (*allocWithTensor)(THTensor *tensor);
-  THTensor* (*allocWithTensorNarrow)(THTensor *tensor, long firstIndex, long size);
-  THTensor* (*allocWithTensorSelect)(THTensor *tensor, long sliceIndex);
+THTensor* THTensor_(allocWithTensor)(THTensor *tensor);
+THTensor* THTensor_(allocWithTensorNarrow)(THTensor *tensor, long firstIndex, long size);
+THTensor* THTensor_(allocWithTensorSelect)(THTensor *tensor, long sliceIndex);
 
-  THTensor* (*allocWithStorage)(THStorage *storage, long storageOffset, int nDimension, long *size);
-  THTensor* (*allocWithStorage1d)(THStorage *storage, long storageOffset,
-                                 long size0);
-  THTensor* (*allocWithStorage2d)(THStorage *storage, long storageOffset,
-                                 long size0, long size1);
-  THTensor* (*allocWithStorage3d)(THStorage *storage, long storageOffset,
-                                 long size0, long size1, long size2);
-  THTensor* (*allocWithStorage4d)(THStorage *storage, long storageOffset,
-                                 long size0, long size1, long size2, long size3);
+THTensor* THTensor_(allocWithStorage)(THStorage *storage, long storageOffset, int nDimension, long *size);
+THTensor* THTensor_(allocWithStorage1d)(THStorage *storage, long storageOffset,
+                                        long size0);
+THTensor* THTensor_(allocWithStorage2d)(THStorage *storage, long storageOffset,
+                                        long size0, long size1);
+THTensor* THTensor_(allocWithStorage3d)(THStorage *storage, long storageOffset,
+                                        long size0, long size1, long size2);
+THTensor* THTensor_(allocWithStorage4d)(THStorage *storage, long storageOffset,
+                                        long size0, long size1, long size2, long size3);
     
-  THTensor* (*allocWithSize)(int nDimension, long *size);
-  THTensor* (*allocWithSize1d)(long size0);
-  THTensor* (*allocWithSize2d)(long size0, long size1);
-  THTensor* (*allocWithSize3d)(long size0, long size1, long size2);
-  THTensor* (*allocWithSize4d)(long size0, long size1, long size2, long size3);
+THTensor* THTensor_(allocWithSize)(int nDimension, long *size);
+THTensor* THTensor_(allocWithSize1d)(long size0);
+THTensor* THTensor_(allocWithSize2d)(long size0, long size1);
+THTensor* THTensor_(allocWithSize3d)(long size0, long size1, long size2);
+THTensor* THTensor_(allocWithSize4d)(long size0, long size1, long size2, long size3);
 
-  THStorage* (*storage)(THTensor *self);
-  long (*storageOffset)(THTensor *self);
-  int (*nDimension)(THTensor *self);
-  long (*size)(THTensor *self, int dim);
-  long (*stride)(THTensor *self, int dim);
+THStorage* THTensor_(storage)(THTensor *self);
+long THTensor_(storageOffset)(THTensor *self);
+int THTensor_(nDimension)(THTensor *self);
+long THTensor_(size)(THTensor *self, int dim);
+long THTensor_(stride)(THTensor *self, int dim);
 
-  void (*resize)(THTensor *self, int nDimension, long *size);
-  void (*resizeAs)(THTensor *self, THTensor *src);
-  void (*resize1d)(THTensor *self, long size0);
-  void (*resize2d)(THTensor *self, long size0, long size1);
-  void (*resize3d)(THTensor *self, long size0, long size1, long size2);
-  void (*resize4d)(THTensor *self, long size0, long size1, long size2, long size3);
+void THTensor_(resize)(THTensor *self, int nDimension, long *size);
+void THTensor_(resizeAs)(THTensor *self, THTensor *src);
+void THTensor_(resize1d)(THTensor *self, long size0);
+void THTensor_(resize2d)(THTensor *self, long size0, long size1);
+void THTensor_(resize3d)(THTensor *self, long size0, long size1, long size2);
+void THTensor_(resize4d)(THTensor *self, long size0, long size1, long size2, long size3);
     
-  /* Slow access methods [check everything] */
-  void (*set1d)(THTensor *self, long x0, real value);
-  void (*set2d)(THTensor *self, long x0, long x1, real value);
-  void (*set3d)(THTensor *self, long x0, long x1, long x2, real value);
-  void (*set4d)(THTensor *self, long x0, long x1, long x2, long x3, real value);
+/* Slow access methods [check everything] */
+void THTensor_(set1d)(THTensor *self, long x0, real value);
+void THTensor_(set2d)(THTensor *self, long x0, long x1, real value);
+void THTensor_(set3d)(THTensor *self, long x0, long x1, long x2, real value);
+void THTensor_(set4d)(THTensor *self, long x0, long x1, long x2, long x3, real value);
   
-  real (*get1d)(THTensor *self, long x0);
-  real (*get2d)(THTensor *self, long x0, long x1);
-  real (*get3d)(THTensor *self, long x0, long x1, long x2);
-  real (*get4d)(THTensor *self, long x0, long x1, long x2, long x3);
+real THTensor_(get1d)(THTensor *self, long x0);
+real THTensor_(get2d)(THTensor *self, long x0, long x1);
+real THTensor_(get3d)(THTensor *self, long x0, long x1, long x2);
+real THTensor_(get4d)(THTensor *self, long x0, long x1, long x2, long x3);
   
-  real* (*data)(THTensor *self);
-  real* (*data1d)(THTensor *self, long i0);
-  real* (*data2d)(THTensor *self, long i0, long i1);
-  real* (*data3d)(THTensor *self, long i0, long i1, long i2);
-  real* (*data4d)(THTensor *self, long i0, long i1, long i2, long i3);
-  long (*nElement)(THTensor *self);
+real* THTensor_(data)(THTensor *self);
+real* THTensor_(data1d)(THTensor *self, long i0);
+real* THTensor_(data2d)(THTensor *self, long i0, long i1);
+real* THTensor_(data3d)(THTensor *self, long i0, long i1, long i2);
+real* THTensor_(data4d)(THTensor *self, long i0, long i1, long i2, long i3);
+long THTensor_(nElement)(THTensor *self);
 
-  void (*copy)(THTensor *self, THTensor *tensor);
+void THTensor_(copy)(THTensor *self, THTensor *tensor);
 
-  void (*retain)(THTensor *self);
-  void (*free)(THTensor *self);
-    
-} THTensorAPI;
+void THTensor_(retain)(THTensor *self);
+void THTensor_(free)(THTensor *self);
+
+#endif

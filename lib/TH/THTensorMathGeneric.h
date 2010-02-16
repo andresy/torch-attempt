@@ -1,3 +1,7 @@
+#ifndef TH_GENERIC_FILE
+#define TH_GENERIC_FILE "THTensorMathGeneric.h"
+#else
+
 void THTensor_(fill)(THTensor *self, real value);
 void THTensor_(zero)(THTensor *self);
 void THTensor_(add)(THTensor *self, real value);
@@ -43,4 +47,6 @@ real THTensor_(var)(THTensor *self);
 real THTensor_(std)(THTensor *self);
 real THTensor_(norm)(THTensor *self, real value);
 real THTensor_(dist)(THTensor *self, THTensor *src, real value);
+#endif
+
 #endif

@@ -3,8 +3,9 @@
 
 #include "THTensor.h"
 #include "THBlas.h"
+#include "THTensorApply.h"
 
-#define TH_GENERIC_FILE "THTensorMathGeneric.h"
+#include "THTensorMathGeneric.h"
 #include "THGenerateAllTypes.h"
 
 #endif

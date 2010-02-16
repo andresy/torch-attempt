@@ -1,3 +1,7 @@
+#ifndef TH_GENERIC_FILE
+#define TH_GENERIC_FILE "THStorageGeneric.h"
+#else
+
 /* ils appellent tous la vtable... THStorage est un module apres tout.
    donc newMappedFile est dans le module. voila.
    et les autres servent pour le polymorphisme.
@@ -6,21 +10,18 @@
 
 typedef struct THStorage THStorage;
 
-extern const struct THStorageAPI
-{
-  THStorage* (*alloc)();
+THStorage* THStorage_(alloc)();
 
-  THStorage* (*allocWithSize)(long);
-  THStorage* (*allocMappedFile)(const char*, int);
-  
-  real* (*data)(THStorage*);
-  long (*size)(THStorage*);
+THStorage* THStorage_(allocWithSize)(long);
+THStorage* THStorage_(allocMappedFile)(const char*, int);
 
-  void (*retain)(THStorage*);
-  void (*copy)(THStorage*, THStorage*);
-  void (*resize)(THStorage*, long);
-  
-  void (*free)(THStorage*);
-  
-} THStorageAPI;
+real* THStorage_(data)(THStorage*);
+long THStorage_(size)(THStorage*);
 
+void THStorage_(retain)(THStorage*);
+void THStorage_(copy)(THStorage*, THStorage*);
+void THStorage_(resize)(THStorage*, long);
+
+void THStorage_(free)(THStorage*);
+
+#endif

@@ -1,4 +1,8 @@
-static void THBlas_(swap)(long n, real *x, long incx, real *y, long incy)
+#ifndef TH_GENERIC_FILE
+#define TH_GENERIC_FILE "THBlasGeneric.c"
+#else
+
+void THBlas_(swap)(long n, real *x, long incx, real *y, long incy)
 {
   if(n == 1)
   {
@@ -34,7 +38,7 @@ static void THBlas_(swap)(long n, real *x, long incx, real *y, long incy)
   }
 }
 
-static void THBlas_(scal)(long n, real a, real *x, long incx)
+void THBlas_(scal)(long n, real a, real *x, long incx)
 {
   if(n == 1)
     incx = 1;
@@ -62,7 +66,7 @@ static void THBlas_(scal)(long n, real a, real *x, long incx)
   }
 }
 
-static void THBlas_(copy)(long n, real *x, long incx, real *y, long incy)
+void THBlas_(copy)(long n, real *x, long incx, real *y, long incy)
 {
   if(n == 1)
   {
@@ -94,7 +98,7 @@ static void THBlas_(copy)(long n, real *x, long incx, real *y, long incy)
   }
 }
 
-static void THBlas_(axpy)(long n, real a, real *x, long incx, real *y, long incy)
+void THBlas_(axpy)(long n, real a, real *x, long incx, real *y, long incy)
 {
   if(n == 1)
   {
@@ -126,7 +130,7 @@ static void THBlas_(axpy)(long n, real a, real *x, long incx, real *y, long incy
   }
 }
 
-static real THBlas_(dot)(long n, real *x, long incx, real *y, long incy)
+real THBlas_(dot)(long n, real *x, long incx, real *y, long incy)
 {
   if(n == 1)
   {
@@ -159,7 +163,7 @@ static real THBlas_(dot)(long n, real *x, long incx, real *y, long incy)
   }
 }
 
-static void THBlas_(gemv)(char trans, long m, long n, real alpha, real *a, long lda, real *x, long incx, real beta, real *y, long incy)
+void THBlas_(gemv)(char trans, long m, long n, real alpha, real *a, long lda, real *x, long incx, real beta, real *y, long incy)
 {
   if(n == 1)
     lda = m;
@@ -213,7 +217,7 @@ static void THBlas_(gemv)(char trans, long m, long n, real alpha, real *a, long 
   }
 }
 
-static void THBlas_(ger)(long m, long n, real alpha, real *x, long incx, real *y, long incy, real *a, long lda)
+void THBlas_(ger)(long m, long n, real alpha, real *x, long incx, real *y, long incy, real *a, long lda)
 {
   if(n == 1)
     lda = m;
@@ -249,7 +253,7 @@ static void THBlas_(ger)(long m, long n, real alpha, real *x, long incx, real *y
   }
 }
 
-static void THBlas_(gemm)(char transa, char transb, long m, long n, long k, real alpha, real *a, long lda, real *b, long ldb, real beta, real *c, long ldc)
+void THBlas_(gemm)(char transa, char transb, long m, long n, long k, real alpha, real *a, long lda, real *b, long ldb, real beta, real *c, long ldc)
 {
   if(n == 1)
     ldc = m;
@@ -369,13 +373,4 @@ static void THBlas_(gemm)(char transa, char transb, long m, long n, long k, real
   }
 }
 
-const struct THBlasAPI THBlasAPI = {
-  THBlas_(swap),
-  THBlas_(scal),
-  THBlas_(copy),
-  THBlas_(axpy),
-  THBlas_(dot),
-  THBlas_(gemv),
-  THBlas_(ger),
-  THBlas_(gemm)
-};
+#endif
