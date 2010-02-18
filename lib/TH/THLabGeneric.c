@@ -205,6 +205,116 @@ void THLab_(cross)(THTensor *a, THTensor *b, int dimension, THTensor *r_)
                            r__data[2*r__stride] = a_data[0*a_stride]*b_data[1*b_stride] - a_data[1*a_stride]*b_data[0*b_stride];);
 }
 
+void THLab_(zeros)(int nDimension, long *size, THTensor *r_)
+{
+  THTensor_(resize)(r_, nDimension, size);
+  THTensor_(zero)(r_);
+}
+
+void THLab_(ones)(int nDimension, long *size, THTensor *r_)
+{
+  THTensor_(resize)(r_, nDimension, size);
+  THTensor_(fill)(r_, 1);
+}
+
+void THLab_(diag)(THTensor *t, int k, THTensor *r_)
+{
+  THArgCheck(THTensor_(nDimension)(t) == 1 || THTensor_(nDimension)(t) == 2, 1, "matrix or a vector expected");
+
+  if(THTensor_(nDimension)(t) == 1)
+  {
+    real *t_data = THTensor_(data)(t);
+    long t_size = THTensor_(size)(t, 0);
+    long sz = t_size + (k >= 0 ? k : -k);
+    real *r__data;
+    long r__stride;
+    long i;
+
+    THTensor_(resize2d)(r_, sz, sz);    
+    THTensor_(zero)(r_);
+    r__data = THTensor_(data)(r_);
+    r__stride = THTensor_(stride)(r_, 1);
+    r__data += (k >= 0 ? k : k*r__stride);
+
+    for(i = 0; i < t_size; i++)
+      r__data[i*(r__stride+1)] = t_data[i];
+  }
+  else
+  {
+    real *t_data = THTensor_(data)(t);
+    long t_stride = THTensor_(stride)(t, 1);
+    long sz;
+    real *r__data;
+    long i;
+
+    if(k >= 0)
+      sz = THMin(THTensor_(size)(t, 0), THTensor_(size)(t, 1)-k);
+    else
+      sz = THMin(THTensor_(size)(t, 0)+k, THTensor_(size)(t, 1));
+    THTensor_(resize1d)(r_, sz);
+    r__data = THTensor_(data)(r_);
+
+    t_data += (k >= 0 ? k : k*t_stride);
+    for(i = 0; i < sz; i++)
+      r__data[i] = t_data[i*(t_stride+1)];
+  }
+}
+
+void THLab_(eye)(long n, long m, THTensor *r_)
+{
+  real *r__data;
+  long i, sz;
+
+  THArgCheck(n > 0, 1, "invalid argument");
+  THArgCheck(m > 0, 1, "invalid argument");
+
+  THTensor_(resize2d)(r_, n, m);
+  THTensor_(zero)(r_);
+
+  i = 0;
+  r__data = THTensor_(data)(r_);
+  sz = THMin(THTensor_(size)(r_, 0), THTensor_(size)(r_, 1));
+  for(i = 0; i < sz; i++)
+    r__data[i*(1+m)] = 1;
+}
+
+
+void THLab_(range)(real xmin, real xmax, real step, THTensor *r_)
+{
+  long size;
+
+  THArgCheck(step > 0, 3, "step must be a positive number");
+  THArgCheck(xmax > xmin, 2, "upper bound must be larger than lower bound");
+
+  size = (long)((xmax-xmin)/step+1);
+  
+  THTensor_(resize1d)(r_, size);
+
+  TH_TENSOR_APPLY(r_, r__data[i] = xmin + ((real)i)*step;);
+}
+
+void THLab_(randperm)(long n, THTensor *r_)
+{
+  real *r__data;
+  long i;
+
+  THArgCheck(n > 0, 1, "must be strictly positive");
+
+  THTensor_(resize1d)(r_, n);
+  r__data = THTensor_(data)(r_);
+
+  for(i = 0; i < n; i++)
+      r__data[i] = (real)(i+1);
+
+  for(i = 0; i < n-1; i++)
+  {
+    long z = THRandom_random() % (n-i);
+    real sav = r__data[i];
+    r__data[i] = r__data[z+i];
+    r__data[z+i] = sav;
+  }
+}
+
 /* floating point only now */
 
 #if defined(TH_REAL_IS_FLOAT) || defined(TH_REAL_IS_DOUBLE)
@@ -357,6 +467,38 @@ void THLab_(norm)(THTensor *t, real value, real *norm_)
 void THLab_(dist)(THTensor *a, THTensor *b, real value, real *dist_)
 { 
   *dist_ = THTensor_(dist)(a, b, value);
+}
+
+void THLab_(linspace)(real a, real b, long n, THTensor *r_)
+{
+  THArgCheck(n > 0, 3, "invalid number of points");
+  THArgCheck(a <= b, 2, "end range should be greater than start range");
+  
+  THTensor_(resize1d)(r_, n);
+
+  TH_TENSOR_APPLY(r_, r__data[i] = a + ((real)i)*(b-a)/((real)(n-1)););
+}
+
+void THLab_(logspace)(real a, real b, long n, THTensor *r_)
+{
+  THArgCheck(n > 0, 3, "invalid number of points");
+  THArgCheck(a <= b, 2, "end range should be greater than start range");
+  
+  THTensor_(resize1d)(r_, n);
+
+  TH_TENSOR_APPLY(r_, r__data[i] = pow(10.0, a + ((real)i)*(b-a)/((real)(n-1))););
+}
+
+void THLab_(rand)(int nDimension, long *size, THTensor *r_)
+{
+  THTensor_(resize)(r_, nDimension, size);
+  THTensor_(uniform)(r_, 0, 1);
+}
+
+void THLab_(randn)(int nDimension, long *size, THTensor *r_)
+{
+  THTensor_(resize)(r_, nDimension, size);
+  THTensor_(normal)(r_, 0, 1);
 }
 
 #endif /* floating point only part */

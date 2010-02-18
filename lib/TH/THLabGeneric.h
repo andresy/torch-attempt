@@ -12,6 +12,13 @@ void THLab_(cumprod)(THTensor *t, int dimension, THTensor *r_);
 void THLab_(trace)(THTensor *t, real *trace_);
 void THLab_(cross)(THTensor *a, THTensor *b, int dimension, THTensor *r_);
 
+void THLab_(zeros)(int nDimension, long *size, THTensor *r_);
+void THLab_(ones)(int nDimension, long *size, THTensor *r_);
+void THLab_(diag)(THTensor *t, int k, THTensor *r_);
+void THLab_(eye)(long n, long m, THTensor *r_);
+void THLab_(range)(real xmin, real xmax, real step, THTensor *r_);
+void THLab_(randperm)(long n, THTensor *r_);
+
 #if defined(TH_REAL_IS_FLOAT) || defined(TH_REAL_IS_DOUBLE)
 
 void THLab_(log)(THTensor *t, THTensor *r_);
@@ -37,6 +44,11 @@ void THLab_(std)(THTensor *t, int dimension, int flag, THTensor *r_);
 void THLab_(var)(THTensor *t, int dimension, int flag, THTensor *r_);
 void THLab_(norm)(THTensor *t, real value, real *norm_);
 void THLab_(dist)(THTensor *a, THTensor *b, real value, real *dist_);
+
+void THLab_(linspace)(real a, real b, long n, THTensor *r_);
+void THLab_(logspace)(real a, real b, long n, THTensor *r_);
+void THLab_(rand)(int nDimension, long *size, THTensor *r_);
+void THLab_(randn)(int nDimension, long *size, THTensor *r_);
 
 #endif
 
