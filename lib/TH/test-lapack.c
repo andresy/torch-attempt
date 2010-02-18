@@ -3,10 +3,10 @@
 #include <limits.h>
 
 #define THEDOT ddot_
-//#define SIZE 2147483653L
-//#define SIZE 19
-//#define SIZE 2147483648
-//#define SIZE (INT_MAX+1L)
+/* #define SIZE 2147483653L */
+/* #define SIZE 19 */
+/* #define SIZE 2147483648 */
+/* #define SIZE (INT_MAX+1L) */
 #define SIZE (INT_MAX)
 
 double l[] = {
@@ -71,7 +71,7 @@ main()
     u[i] = i;
   }
 
-  printf("dude = %lf\n", ddotxxx(4, l, 1, u, 1));
+  printf("dude = %f\n", ddotxxx(4, l, 1, u, 1));
   printf("size = %ld INT_MAX = %ld\n", (long)(SIZE), (long)(INT_MAX));
 
   z = malloc(sizeof(float)*SIZE);
@@ -80,7 +80,7 @@ main()
   z[0] = 2;
   z[SIZE-1] = 3;
   printf("ready\n");
-  printf("dude extended = %lf\n", sdot(SIZE, z, 1, z, 1));
+  printf("dude extended = %f\n", sdot(SIZE, z, 1, z, 1));
 
   return 0;
 }

@@ -141,7 +141,11 @@ THTensor *THTensor_(allocWithStorage)(THStorage *storage, long storageOffset, in
 THTensor *THTensor_(allocWithStorage4d)(THStorage *storage, long storageOffset,
                                              long size0, long size1, long size2, long size3)
 {
-  long size[4] = {size0, size1, size2, size3};
+  long size[4];
+  size[0] = size0;
+  size[1] = size1;
+  size[2] = size2;
+  size[3] = size3;
   return THTensor_(allocWithStorage)(storage, storageOffset, 4, size);
 }
 
@@ -172,7 +176,11 @@ THTensor *THTensor_(allocWithSize)(int nDimension, long *size)
 
 THTensor *THTensor_(allocWithSize4d)(long size0, long size1, long size2, long size3)
 {
-  long size[4] = {size0, size1, size2, size3};
+  long size[4];
+  size[0] = size0;
+  size[1] = size1;
+  size[2] = size2;
+  size[3] = size3;
   return THTensor_(allocWithSize)(4, size);
 }
 
@@ -226,7 +234,11 @@ void THTensor_(resizeAs)(THTensor *self, THTensor *tensor)
 
 void THTensor_(resize4d)(THTensor *self, long size0, long size1, long size2, long size3)
 {
-  long size[4] = {size0, size1, size2, size3};
+  long size[4];
+  size[0] = size0;
+  size[1] = size1;
+  size[2] = size2;
+  size[3] = size3;
   THTensor_(resize)(self, 4, size);
 }
 

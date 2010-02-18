@@ -23,7 +23,7 @@ void THTensor_(addMatVec)(THTensor *self, real alpha, int transpose, THTensor *m
 void THTensor_(addMatMat)(THTensor *self, real alpha, int transpose1, THTensor *mat1, int transpose2, THTensor *mat2);
 void THTensor_(addVecVec)(THTensor *self, real alpha, THTensor *vec1, THTensor *vec2);
 
-#if (TH_IS_FLOAT || TH_IS_DOUBLE)
+#if defined(TH_REAL_IS_FLOAT) || defined(TH_REAL_IS_DOUBLE)
 void THTensor_(log)(THTensor *self);
 void THTensor_(log1p)(THTensor *self);
 void THTensor_(exp)(THTensor *self);

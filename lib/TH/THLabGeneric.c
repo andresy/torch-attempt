@@ -167,9 +167,79 @@ void THLab_(trace)(THTensor *t, real *trace_)
   *trace_ = sum;
 }
 
+void THLab_(cross)(THTensor *a, THTensor *b, int dimension, THTensor *r_)
+{
+  int i;
+
+  if(THTensor_(nDimension)(a) != THTensor_(nDimension)(b))
+    THError("inconsitent tensor sizes");
+  
+  for(i = 0; i < THTensor_(nDimension)(a); i++)
+  {
+    if(THTensor_(size)(a, i) != THTensor_(size)(b, i))
+      THError("inconsistent tensor sizes");
+  }
+  
+  if(dimension < 0)
+  {
+    for(i = 0; i < THTensor_(nDimension)(a); i++)
+    {
+      if(THTensor_(size)(a, i) == 3)
+      {
+        dimension = i;
+        break;
+      }
+    }
+    if(dimension < 0)
+      THError("no dimension of size 3");
+  }
+
+  THArgCheck(dimension >= 0 && dimension < THTensor_(nDimension)(a), 3, "dimension out of range");
+  THArgCheck(THTensor_(size)(a, dimension) == 3, 3, "dimension size is not 3");
+
+  THTensor_(resizeAs)(r_, a);
+
+  TH_GEN_TENSOR_DIM_APPLY3(a, b, r_, dimension,
+                           r__data[0*r__stride] = a_data[1*a_stride]*b_data[2*b_stride] - a_data[2*a_stride]*b_data[1*b_stride];
+                           r__data[1*r__stride] = a_data[2*a_stride]*b_data[0*b_stride] - a_data[0*a_stride]*b_data[2*b_stride];
+                           r__data[2*r__stride] = a_data[0*a_stride]*b_data[1*b_stride] - a_data[1*a_stride]*b_data[0*b_stride];);
+}
+
 /* floating point only now */
 
 #if defined(TH_REAL_IS_FLOAT) || defined(TH_REAL_IS_DOUBLE)
+
+#define LAB_IMPLEMENT_BASIC_FUNCTION(NAME, CFUNC)             \
+  void THLab_(NAME)(THTensor *t, THTensor *r_)                \
+  {                                                           \
+    THTensor_(resizeAs)(r_, t);                               \
+    TH_TENSOR_APPLY2(t, r_, r__data[i] = CFUNC(t_data[i]););  \
+  }                                                           \
+
+#define LAB_IMPLEMENT_BASIC_FUNCTION_VALUE(NAME, CFUNC)              \
+  void THLab_(NAME)(THTensor *t, real value, THTensor *r_)           \
+  {                                                                  \
+    THTensor_(resizeAs)(r_, t);                                      \
+    TH_TENSOR_APPLY2(t, r_, r__data[i] = CFUNC(t_data[i], value););  \
+  }                                                                  \
+
+LAB_IMPLEMENT_BASIC_FUNCTION(log,log)
+LAB_IMPLEMENT_BASIC_FUNCTION(log1p,log1p)
+LAB_IMPLEMENT_BASIC_FUNCTION(exp,exp)
+LAB_IMPLEMENT_BASIC_FUNCTION(cos,cos)
+LAB_IMPLEMENT_BASIC_FUNCTION(acos,acos)
+LAB_IMPLEMENT_BASIC_FUNCTION(cosh,cosh)
+LAB_IMPLEMENT_BASIC_FUNCTION(sin,sin)
+LAB_IMPLEMENT_BASIC_FUNCTION(asin,asin)
+LAB_IMPLEMENT_BASIC_FUNCTION(sinh,sinh)
+LAB_IMPLEMENT_BASIC_FUNCTION(tan,tan)
+LAB_IMPLEMENT_BASIC_FUNCTION(atan,atan)
+LAB_IMPLEMENT_BASIC_FUNCTION(tanh,tanh)
+LAB_IMPLEMENT_BASIC_FUNCTION_VALUE(pow,pow)
+LAB_IMPLEMENT_BASIC_FUNCTION(sqrt,sqrt)
+LAB_IMPLEMENT_BASIC_FUNCTION(ceil,ceil)
+LAB_IMPLEMENT_BASIC_FUNCTION(floor,floor)
+LAB_IMPLEMENT_BASIC_FUNCTION(abs,fabs)
 
 void THLab_(mean)(THTensor *t, int dimension, THTensor *r_)
 {
