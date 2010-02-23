@@ -10,17 +10,22 @@
 
 typedef struct THStorage THStorage;
 
-THStorage* THStorage_(alloc)();
+THStorage* THStorage_(new)();
 
-THStorage* THStorage_(allocWithSize)(long);
-THStorage* THStorage_(allocMappedFile)(const char*, int);
+THStorage* THStorage_(newWithSize)(long);
+THStorage* THStorage_(newWithMapping)(const char*, int);
 
 real* THStorage_(data)(THStorage*);
 long THStorage_(size)(THStorage*);
 
+void THStorage_(fill)(THStorage*, real);
+
 void THStorage_(retain)(THStorage*);
 void THStorage_(copy)(THStorage*, THStorage*);
 void THStorage_(resize)(THStorage*, long);
+
+real THStorage_(get)(THStorage*, long);
+void THStorage_(set)(THStorage*, long, real);
 
 void THStorage_(free)(THStorage*);
 

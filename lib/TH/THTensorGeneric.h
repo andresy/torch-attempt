@@ -4,33 +4,38 @@
 
 typedef struct THTensor THTensor;
 
-THTensor* THTensor_(alloc)();
+THTensor* THTensor_(new)();
 
-THTensor* THTensor_(allocWithTensor)(THTensor *tensor);
-THTensor* THTensor_(allocWithTensorNarrow)(THTensor *tensor, long firstIndex, long size);
-THTensor* THTensor_(allocWithTensorSelect)(THTensor *tensor, long sliceIndex);
+/* only for empty tensors */
+void THTensor_(init)(THTensor *self, THStorage *storage, long storageOffset, int nDimension, long *size);
 
-THTensor* THTensor_(allocWithStorage)(THStorage *storage, long storageOffset, int nDimension, long *size);
-THTensor* THTensor_(allocWithStorage1d)(THStorage *storage, long storageOffset,
+THTensor* THTensor_(newWithTensor)(THTensor *tensor);
+THTensor* THTensor_(newWithTensorNarrow)(THTensor *tensor, long firstIndex, long size);
+THTensor* THTensor_(newWithTensorSelect)(THTensor *tensor, long sliceIndex);
+
+THTensor* THTensor_(newWithStorage)(THStorage *storage, long storageOffset, int nDimension, long *size);
+THTensor* THTensor_(newWithStorage1d)(THStorage *storage, long storageOffset,
                                         long size0);
-THTensor* THTensor_(allocWithStorage2d)(THStorage *storage, long storageOffset,
+THTensor* THTensor_(newWithStorage2d)(THStorage *storage, long storageOffset,
                                         long size0, long size1);
-THTensor* THTensor_(allocWithStorage3d)(THStorage *storage, long storageOffset,
+THTensor* THTensor_(newWithStorage3d)(THStorage *storage, long storageOffset,
                                         long size0, long size1, long size2);
-THTensor* THTensor_(allocWithStorage4d)(THStorage *storage, long storageOffset,
+THTensor* THTensor_(newWithStorage4d)(THStorage *storage, long storageOffset,
                                         long size0, long size1, long size2, long size3);
     
-THTensor* THTensor_(allocWithSize)(int nDimension, long *size);
-THTensor* THTensor_(allocWithSize1d)(long size0);
-THTensor* THTensor_(allocWithSize2d)(long size0, long size1);
-THTensor* THTensor_(allocWithSize3d)(long size0, long size1, long size2);
-THTensor* THTensor_(allocWithSize4d)(long size0, long size1, long size2, long size3);
+THTensor* THTensor_(newWithSize)(int nDimension, long *size);
+THTensor* THTensor_(newWithSize1d)(long size0);
+THTensor* THTensor_(newWithSize2d)(long size0, long size1);
+THTensor* THTensor_(newWithSize3d)(long size0, long size1, long size2);
+THTensor* THTensor_(newWithSize4d)(long size0, long size1, long size2, long size3);
 
 THStorage* THTensor_(storage)(THTensor *self);
 long THTensor_(storageOffset)(THTensor *self);
 int THTensor_(nDimension)(THTensor *self);
 long THTensor_(size)(THTensor *self, int dim);
 long THTensor_(stride)(THTensor *self, int dim);
+THLongStorage *THTensor_(newSizeOf)(THTensor *self);
+THLongStorage *THTensor_(newStrideOf)(THTensor *self);
 
 void THTensor_(resize)(THTensor *self, int nDimension, long *size);
 void THTensor_(resizeAs)(THTensor *self, THTensor *src);

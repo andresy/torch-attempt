@@ -315,6 +315,146 @@ void THLab_(randperm)(long n, THTensor *r_)
   }
 }
 
+void THLab_(reshape)(THTensor *t, int nDimension, long *size, THTensor *r_)
+{
+  THTensor_(resize)(r_, nDimension, size);
+  THTensor_(copy)(r_, t);
+}
+
+/* I cut and pasted (slightly adapted) the quicksort code from
+   http://www.alienryderflex.com/quicksort/
+   This public-domain C implementation by Darel Rex Finley.
+   Thanks man :)
+*/
+#define  MAX_LEVELS  300
+static void THLab_(quicksortascend)(real *arr, long *idx, long elements, long stride)
+{
+  long beg[MAX_LEVELS], end[MAX_LEVELS], i=0, L, R, swap, pid;
+  real piv;
+  
+  beg[0]=0; end[0]=elements;
+  while (i>=0) {
+    L=beg[i]; R=end[i]-1;
+    if (L<R) {
+      piv=arr[L*stride];
+      pid=idx[L*stride];
+      while (L<R) {
+        while (arr[R*stride]>=piv && L<R) R--; if (L<R) {idx[L*stride]=idx[R*stride]; arr[L*stride]=arr[R*stride]; L++;}
+        while (arr[L*stride]<=piv && L<R) L++; if (L<R) {idx[R*stride]=idx[L*stride]; arr[R*stride]=arr[L*stride]; R--;} }
+      idx[L*stride]=pid; arr[L*stride]=piv; beg[i+1]=L+1; end[i+1]=end[i]; end[i++]=L;
+      if (end[i]-beg[i]>end[i-1]-beg[i-1]) {
+        swap=beg[i]; beg[i]=beg[i-1]; beg[i-1]=swap;
+        swap=end[i]; end[i]=end[i-1]; end[i-1]=swap; }}
+    else {
+      i--; }}}
+
+static void THLab_(quicksortdescend)(real *arr, long *idx, long elements, long stride)
+{
+  long beg[MAX_LEVELS], end[MAX_LEVELS], i=0, L, R, swap, pid;
+  real piv;
+  
+  beg[0]=0; end[0]=elements;
+  while (i>=0) {
+    L=beg[i]; R=end[i]-1;
+    if (L<R) {
+      piv=arr[L*stride];
+      pid=idx[L*stride];
+      while (L<R) {
+        while (arr[R*stride]<=piv && L<R) R--; if (L<R) {idx[L*stride]=idx[R*stride]; arr[L*stride]=arr[R*stride]; L++;}
+        while (arr[L*stride]>=piv && L<R) L++; if (L<R) {idx[R*stride]=idx[L*stride]; arr[R*stride]=arr[L*stride]; R--;} }
+      idx[L*stride]=pid; arr[L*stride]=piv; beg[i+1]=L+1; end[i+1]=end[i]; end[i++]=L;
+      if (end[i]-beg[i]>end[i-1]-beg[i-1]) {
+        swap=beg[i]; beg[i]=beg[i-1]; beg[i-1]=swap;
+        swap=end[i]; end[i]=end[i-1]; end[i-1]=swap; }}
+    else {
+      i--; }}}
+
+void THLab_(sort)(THTensor *t, int dimension, int descendingOrder, THTensor *rt_, THLongTensor *ri_)
+{
+  THArgCheck(dimension >= 0 && dimension < THTensor_(nDimension)(t), 2, "invalid dimension");
+
+  THTensor_(resizeAs)(rt_, t);
+  THTensor_(copy)(rt_, t);
+
+  {
+    long i;
+    int nDimension = THTensor_(nDimension)(t);
+    long *size = THAlloc(sizeof(nDimension));
+    for(i = 0; i < nDimension; i++)
+      size[i] = THTensor_(size)(t, i);
+    THLongTensor_resize(ri_, nDimension, size);
+  }
+
+  if(descendingOrder)
+  {
+    TH_TENSOR_DIM_APPLY2(real, Real, rt_, long, Long, ri_, dimension, 
+                         long i;
+                         for(i = 0; i < ri__size; i++)
+                           ri__data[i*ri__stride] = i;
+                         THLab_(quicksortdescend)(rt__data, ri__data, rt__size, rt__stride);)
+  }
+  else
+  {
+    TH_TENSOR_DIM_APPLY2(real, Real, rt_, long, Long, ri_, dimension,
+                         long i;
+                         for(i = 0; i < ri__size; i++)
+                           ri__data[i*ri__stride] = i;
+                         THLab_(quicksortascend)(rt__data, ri__data, rt__size, rt__stride);)
+  }
+}
+
+void THLab_(tril)(THTensor *t, long k, THTensor *r_)
+{
+  long stride, t_size_r, t_size_c;
+  real *t_data, *r__data;
+  long r, c;
+
+  THArgCheck(THTensor_(nDimension)(t) == 2, 1, "not a matrix");
+
+  THTensor_(resizeAs)(r_, t);
+
+  stride = THTensor_(stride)(t, 1);
+  t_size_r = THTensor_(size)(t, 0);
+  t_size_c = THTensor_(size)(t, 1);
+  r__data = THTensor_(data)(r_);
+  t_data = THTensor_(data)(t);
+
+  for(r = 0; r < t_size_r; r++)
+  {
+    long sz = THMin(r+k, t_size_c);
+    for(c = THMax(0, r+k); c < t_size_c; c++)
+      r__data[r*stride+c] = 0;
+    for(c = 0; c < sz; c++)
+      r__data[r*stride+c] = t_data[r*stride+c];
+  }
+}
+
+void THLab_(triu)(THTensor *t, long k, THTensor *r_)
+{
+  long stride, t_size_r, t_size_c;
+  real *t_data, *r__data;
+  long r, c;
+
+  THArgCheck(THTensor_(nDimension)(t) == 2, 1, "not a matrix");
+
+  THTensor_(resizeAs)(r_, t);
+
+  stride = THTensor_(stride)(t, 1);
+  t_size_r = THTensor_(size)(t, 0);
+  t_size_c = THTensor_(size)(t, 1);
+  r__data = THTensor_(data)(r_);
+  t_data = THTensor_(data)(t);
+
+  for(r = 0; r < t_size_r; r++)
+  {
+    long sz = THMin(r+k, t_size_c);
+    for(c = THMax(0, r+k); c < t_size_c; c++)
+      r__data[r*stride+c] = t_data[r*stride+c];
+    for(c = 0; c < sz; c++)
+      r__data[r*stride+c] = 0;
+  }
+}
+
 /* floating point only now */
 
 #if defined(TH_REAL_IS_FLOAT) || defined(TH_REAL_IS_DOUBLE)

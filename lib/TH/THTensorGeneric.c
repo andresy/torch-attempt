@@ -62,14 +62,15 @@ void THTensor_(resize)(THTensor *self, int nDimension, long *size)
   }
 }
 
-static THTensor* THTensor_(init)(THStorage *storage, long storageOffset, int nDimension, long *size)
+void THTensor_(init)(THTensor *self, THStorage *storage, long storageOffset, int nDimension, long *size)
 {
-  THTensor* self = THAlloc(sizeof(THTensor));
-
   if(storage)
+  {
     self->storage = storage;
+    THStorage_(retain)(storage);
+  }
   else
-    self->storage = THStorage_(alloc)();
+    self->storage = THStorage_(new)();
   
   self->storageOffset = (storageOffset > 0 ? storageOffset : 0);
   
@@ -80,23 +81,25 @@ static THTensor* THTensor_(init)(THStorage *storage, long storageOffset, int nDi
 
   if(nDimension > 0)
     THTensor_(resize)(self, nDimension, size);
-
-  return self;
 }
 
 /* Empty init */
-THTensor *THTensor_(alloc)()
+THTensor *THTensor_(new)()
 {
-  return THTensor_(init)(NULL, 0, 0, NULL);
+  THTensor* self = THAlloc(sizeof(THTensor));
+  THTensor_(init)(self, NULL, 0, 0, NULL);
+  return self;
 }
 
 /* Pointer-copy init */
-THTensor* THTensor_(allocWithTensor)(THTensor *tensor)
+THTensor* THTensor_(newWithTensor)(THTensor *tensor)
 {
-  return THTensor_(init)(tensor->storage, tensor->storageOffset, tensor->nDimension, tensor->size);
+  THTensor* self = THAlloc(sizeof(THTensor));
+  THTensor_(init)(self, tensor->storage, tensor->storageOffset, tensor->nDimension, tensor->size);
+  return self;
 }
 
-THTensor* THTensor_(allocWithTensorNarrow)(THTensor *tensor, long firstIndex, long size)
+THTensor* THTensor_(newWithTensorNarrow)(THTensor *tensor, long firstIndex, long size)
 {
   THTensor *self;
   int dimension = tensor->nDimension-1;
@@ -104,14 +107,14 @@ THTensor* THTensor_(allocWithTensorNarrow)(THTensor *tensor, long firstIndex, lo
   THArgCheck( (firstIndex >= 0) && (firstIndex < tensor->size[dimension]), 2, "out of range");
   THArgCheck( (size > 0) && (firstIndex+size <= tensor->size[dimension]), 3, "out of range");
 
-  self = THTensor_(allocWithTensor)(tensor);
+  self = THTensor_(newWithTensor)(tensor);
   self->storageOffset += firstIndex*self->stride[dimension];
   self->size[dimension] = size;
 
   return self;
 }
 
-THTensor* THTensor_(allocWithTensorSelect)(THTensor *tensor, long sliceIndex)
+THTensor* THTensor_(newWithTensorSelect)(THTensor *tensor, long sliceIndex)
 {
   THTensor *self;
   int dimension = tensor->nDimension-1;
@@ -120,7 +123,7 @@ THTensor* THTensor_(allocWithTensorSelect)(THTensor *tensor, long sliceIndex)
   THArgCheck((dimension >= 0) && (dimension < tensor->nDimension), 1, "out of range");
   THArgCheck((sliceIndex >= 0) && (sliceIndex < tensor->size[dimension]), 2, "out of range");
 
-  self = THTensor_(allocWithTensor)(tensor);
+  self = THTensor_(newWithTensor)(tensor);
   self->storageOffset += sliceIndex*self->stride[dimension];
   for(d = dimension; d < self->nDimension-1; d++)
   {
@@ -133,12 +136,14 @@ THTensor* THTensor_(allocWithTensorSelect)(THTensor *tensor, long sliceIndex)
 }
 
 /* Storage init */
-THTensor *THTensor_(allocWithStorage)(THStorage *storage, long storageOffset, int nDimension, long *size)
+THTensor *THTensor_(newWithStorage)(THStorage *storage, long storageOffset, int nDimension, long *size)
 {
-  return THTensor_(init)(storage, storageOffset, nDimension, size);
+  THTensor* self = THAlloc(sizeof(THTensor));
+  THTensor_(init)(self, storage, storageOffset, nDimension, size);
+  return self;
 }
 
-THTensor *THTensor_(allocWithStorage4d)(THStorage *storage, long storageOffset,
+THTensor *THTensor_(newWithStorage4d)(THStorage *storage, long storageOffset,
                                              long size0, long size1, long size2, long size3)
 {
   long size[4];
@@ -146,57 +151,59 @@ THTensor *THTensor_(allocWithStorage4d)(THStorage *storage, long storageOffset,
   size[1] = size1;
   size[2] = size2;
   size[3] = size3;
-  return THTensor_(allocWithStorage)(storage, storageOffset, 4, size);
+  return THTensor_(newWithStorage)(storage, storageOffset, 4, size);
 }
 
-THTensor *THTensor_(allocWithStorage1d)(THStorage *storage, long storageOffset,
+THTensor *THTensor_(newWithStorage1d)(THStorage *storage, long storageOffset,
                                              long size0)
 {
-  return THTensor_(allocWithStorage4d)(storage, storageOffset, size0, 0, 0, 0);
+  return THTensor_(newWithStorage4d)(storage, storageOffset, size0, 0, 0, 0);
 }
 
-THTensor *THTensor_(allocWithStorage2d)(THStorage *storage, long storageOffset,
+THTensor *THTensor_(newWithStorage2d)(THStorage *storage, long storageOffset,
                                              long size0, long size1)
 {
-  return THTensor_(allocWithStorage4d)(storage, storageOffset, size0, size1, 0, 0);
+  return THTensor_(newWithStorage4d)(storage, storageOffset, size0, size1, 0, 0);
 }
 
-THTensor *THTensor_(allocWithStorage3d)(THStorage *storage, long storageOffset,
+THTensor *THTensor_(newWithStorage3d)(THStorage *storage, long storageOffset,
                                              long size0, long size1, long size2)
 {
-  return THTensor_(allocWithStorage4d)(storage, storageOffset, size0, size1, size2, 0);
+  return THTensor_(newWithStorage4d)(storage, storageOffset, size0, size1, size2, 0);
 }
 
 
 /* Normal init */
-THTensor *THTensor_(allocWithSize)(int nDimension, long *size)
+THTensor *THTensor_(newWithSize)(int nDimension, long *size)
 {
-  return THTensor_(init)(NULL, 0, nDimension, size);
+  THTensor* self = THAlloc(sizeof(THTensor));
+  THTensor_(init)(self, NULL, 0, nDimension, size);
+  return self;
 }
 
-THTensor *THTensor_(allocWithSize4d)(long size0, long size1, long size2, long size3)
+THTensor *THTensor_(newWithSize4d)(long size0, long size1, long size2, long size3)
 {
   long size[4];
   size[0] = size0;
   size[1] = size1;
   size[2] = size2;
   size[3] = size3;
-  return THTensor_(allocWithSize)(4, size);
+  return THTensor_(newWithSize)(4, size);
 }
 
-THTensor *THTensor_(allocWithSize1d)(long size0)
+THTensor *THTensor_(newWithSize1d)(long size0)
 {
-  return THTensor_(allocWithSize4d)(size0, 0, 0, 0);
+  return THTensor_(newWithSize4d)(size0, 0, 0, 0);
 }
 
-THTensor *THTensor_(allocWithSize2d)(long size0, long size1)
+THTensor *THTensor_(newWithSize2d)(long size0, long size1)
 {
-  return THTensor_(allocWithSize4d)(size0, size1, 0, 0);
+  return THTensor_(newWithSize4d)(size0, size1, 0, 0);
 }
 
-THTensor *THTensor_(allocWithSize3d)(long size0, long size1, long size2)
+THTensor *THTensor_(newWithSize3d)(long size0, long size1, long size2)
 {
-  return THTensor_(allocWithSize4d)(size0, size1, size2, 0);
+  return THTensor_(newWithSize4d)(size0, size1, size2, 0);
 }
 
 THStorage* THTensor_(storage)(THTensor *self)
@@ -224,6 +231,20 @@ long THTensor_(stride)(THTensor *self, int dim)
 {
   THArgCheck( (dim >= 0) && (dim < self->nDimension), 2, "invalid dimension");
   return self->stride[dim];
+}
+
+THLongStorage *THTensor_(newSizeOf)(THTensor *self)
+{
+  THLongStorage *storage = THLongStorage_new(self->nDimension);
+  memcpy(THLongStorage_data(storage), self->size, sizeof(long)*self->nDimension);
+  return storage;
+}
+
+THLongStorage *THTensor_(newStrideOf)(THTensor *self)
+{
+  THLongStorage *storage = THLongStorage_new(self->nDimension);
+  memcpy(THLongStorage_data(storage), self->stride, sizeof(long)*self->nDimension);
+  return storage;
 }
 
 /* Resize */

@@ -5,7 +5,7 @@ SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_MODULE_PATH})
 FIND_PACKAGE(LAPACK)
 
 SET(src
-  THGeneral.c THRandom.c THBlas.c THStorage.c THTensor.c THTensorMath.c THTensorRandom.c THLab.c)
+  THGeneral.c THRandom.c THBlas.c THStorage.c THStorageCopy.c THTensor.c THTensorCopy.c THTensorMath.c THTensorRandom.c THLab.c)
 
 ADD_LIBRARY(TH ${src} ${gen})
 

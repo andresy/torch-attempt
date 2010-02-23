@@ -19,6 +19,11 @@ void THLab_(eye)(long n, long m, THTensor *r_);
 void THLab_(range)(real xmin, real xmax, real step, THTensor *r_);
 void THLab_(randperm)(long n, THTensor *r_);
 
+void THLab_(reshape)(THTensor *t, int nDimension, long *size, THTensor *r_);
+void THLab_(sort)(THTensor *t, int dimension, int descendingOrder, THTensor *rt_, THLongTensor *ri_);
+void THLab_(tril)(THTensor *t, long k, THTensor *r_);
+void THLab_(triu)(THTensor *t, long k, THTensor *r_);
+
 #if defined(TH_REAL_IS_FLOAT) || defined(TH_REAL_IS_DOUBLE)
 
 void THLab_(log)(THTensor *t, THTensor *r_);

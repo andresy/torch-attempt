@@ -26,9 +26,9 @@ struct THStorage
 /* normal storages */
 struct THStorageVTable THStorage_(vtable);
 
-THStorage* THStorage_(alloc)()
+THStorage* THStorage_(new)()
 {
-  THStorage *self = malloc(sizeof(THStorage));
+  THStorage *self = THAlloc(sizeof(THStorage));
   self->vtable = &THStorage_(vtable);
   self->size = 0;
   self->refcount = 1;
@@ -36,11 +36,11 @@ THStorage* THStorage_(alloc)()
   return self;
 }
 
-THStorage* THStorage_(allocWithSize)(long size)
+THStorage* THStorage_(newWithSize)(long size)
 {
-  THStorage *self = THStorage_(alloc)();
+  THStorage *self = THStorage_(new)();
   self->size = size;
-  self->data = malloc(sizeof(real)*size);
+  self->data = THAlloc(sizeof(real)*size);
   return self;
 }
 
@@ -54,12 +54,19 @@ long THStorage_(size)(THStorage *self)
   return self->size;
 }
 
+void THStorage_(fill)(THStorage *self, real value)
+{
+  long i;
+  for(i = 0; i < self->size; i++)
+    self->data[i] = value;
+}
+
 void THStorage_(resize)(THStorage *self, long size)
 {
   if(size != self->size)
   {
     self->size = size;
-    self->data = realloc(self->data, sizeof(real)*size);
+    self->data = THRealloc(self->data, sizeof(real)*size);
   }
 }
 
@@ -67,7 +74,7 @@ void THStorage_(copy)(THStorage *self, THStorage *storage)
 {
   int i;
 
-/*  THAssert(self->size == self->size); */
+  THArgCheck(self->size == storage->size, 2, "inconsistent storage sizes");
   
   for(i = 0; i < self->size; i++)
     self->data[i] = self->data[i];
@@ -76,6 +83,18 @@ void THStorage_(copy)(THStorage *self, THStorage *storage)
 void THStorage_(retain)(THStorage *self)
 {
   ++self->refcount;
+}
+
+real THStorage_(get)(THStorage *self, long idx)
+{
+  THArgCheck(idx >= 0 && idx < self->size, 2, "index out of range");
+  return self->data[idx];
+}
+
+void THStorage_(set)(THStorage *self, long idx, real value)
+{
+  THArgCheck(idx >= 0 && idx < self->size, 2, "index out of range");
+  self->data[idx] = value;
 }
 
 void THStorage_(free)(THStorage *self)
@@ -101,9 +120,9 @@ struct THStorageVTable THStorage_(vtable) = {
 
 struct THStorageVTable THMappedStorage_(vtable);
 
-THStorage* THStorage_(allocWithMapping)(const char *filename, int isshared)
+THStorage* THStorage_(newWithMapping)(const char *filename, int isshared)
 {
-  THStorage *self = malloc(sizeof(THStorage));
+  THStorage *self = THAlloc(sizeof(THStorage));
   long size;
 
   /* virtual table */
@@ -233,7 +252,7 @@ void THMappedStorage_(free)(THStorage *self)
 
 #else
 
-THStorage* THStorage_(allocWithMapping)(const char *filename, int isshared)
+THStorage* THStorage_(newWithMapping)(const char *filename, int isshared)
 {
   THError("File mapped storages are not supported on your system");
   return NULL;

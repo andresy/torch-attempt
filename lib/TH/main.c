@@ -2,8 +2,8 @@
 
 int main()
 {
-  THDoubleStorage *storaged = THDoubleStorage_allocWithSize(10);
-  THFloatStorage *storagef = THFloatStorage_allocWithSize(10);
+  THDoubleStorage *storaged = THDoubleStorage_newWithSize(10);
+  THFloatStorage *storagef = THFloatStorage_newWithSize(10);
 
   THDoubleStorage_resize(storaged, 100);
   THDoubleStorage_free(storaged);
