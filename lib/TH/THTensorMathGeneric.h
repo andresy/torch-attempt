@@ -19,9 +19,9 @@ real THTensor_(min)(THTensor *self);
 real THTensor_(max)(THTensor *self);
 real THTensor_(sum)(THTensor *self);
 
-void THTensor_(addMatVec)(THTensor *self, real alpha, int transpose, THTensor *mat, THTensor *vec);
-void THTensor_(addMatMat)(THTensor *self, real alpha, int transpose1, THTensor *mat1, int transpose2, THTensor *mat2);
-void THTensor_(addVecVec)(THTensor *self, real alpha, THTensor *vec1, THTensor *vec2);
+void THTensor_(addmv)(THTensor *self, real alpha, int transpose, THTensor *mat, THTensor *vec);
+void THTensor_(addmm)(THTensor *self, real alpha, int transpose1, THTensor *mat1, int transpose2, THTensor *mat2);
+void THTensor_(addr)(THTensor *self, real alpha, THTensor *vec1, THTensor *vec2);
 
 #if defined(TH_REAL_IS_FLOAT) || defined(TH_REAL_IS_DOUBLE)
 void THTensor_(log)(THTensor *self);

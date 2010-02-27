@@ -10,7 +10,7 @@
 
 typedef struct THStorage THStorage;
 
-THStorage* THStorage_(new)();
+THStorage* THStorage_(new)(void);
 
 THStorage* THStorage_(newWithSize)(long);
 THStorage* THStorage_(newWithMapping)(const char*, int);

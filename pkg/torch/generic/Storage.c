@@ -100,7 +100,8 @@ static int torch_(Storage___index__)(lua_State *L)
   {
     THStorage *storage = luaT_checkudata(L, 1, torch_(Storage_id));
     long index = luaL_checklong(L, 2) - 1;
-    THStorage_(get)(storage, index);
+    lua_pushnumber(L, THStorage_(get)(storage, index));
+    lua_pushboolean(L, 1);
     return 2;
   }
   else

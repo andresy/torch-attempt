@@ -4,7 +4,7 @@
 
 typedef struct THTensor THTensor;
 
-THTensor* THTensor_(new)();
+THTensor* THTensor_(new)(void);
 
 /* only for empty tensors */
 void THTensor_(init)(THTensor *self, THStorage *storage, long storageOffset, int nDimension, long *size);

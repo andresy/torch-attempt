@@ -2,36 +2,10 @@
 #define TH_GENERIC_FILE "THTensorMathGeneric.c"
 #else
 
-#define TENSOR_IMPLEMENT_BASIC_FUNCTION(NAME, CFUNC)           \
-  void THTensor_(NAME)(THTensor *self)                  \
-  {                                                            \
-    TH_TENSOR_APPLY(self, self_data[i] = CFUNC(self_data[i]);) \
-  }                                                            \
-
-#define TENSOR_IMPLEMENT_BASIC_FUNCTION_VALUE(NAME, CFUNC)              \
-  void THTensor_(NAME)(THTensor *self, real value)               \
-  {                                                                     \
-    TH_TENSOR_APPLY(self, self_data[i] = CFUNC(self_data[i], value););  \
-  }                                                                     \
-
-TENSOR_IMPLEMENT_BASIC_FUNCTION(log, log)
-TENSOR_IMPLEMENT_BASIC_FUNCTION(log1p, log1p)
-TENSOR_IMPLEMENT_BASIC_FUNCTION(exp, exp)
-TENSOR_IMPLEMENT_BASIC_FUNCTION(cos, cos)
-TENSOR_IMPLEMENT_BASIC_FUNCTION(acos, acos)
-TENSOR_IMPLEMENT_BASIC_FUNCTION(cosh, cosh)
-TENSOR_IMPLEMENT_BASIC_FUNCTION(sin, sin)
-TENSOR_IMPLEMENT_BASIC_FUNCTION(asin, asin)
-TENSOR_IMPLEMENT_BASIC_FUNCTION(sinh, sinh)
-TENSOR_IMPLEMENT_BASIC_FUNCTION(tan, tan)
-TENSOR_IMPLEMENT_BASIC_FUNCTION(atan, atan)
-TENSOR_IMPLEMENT_BASIC_FUNCTION(tanh, tanh)
-TENSOR_IMPLEMENT_BASIC_FUNCTION_VALUE(pow, pow)
-TENSOR_IMPLEMENT_BASIC_FUNCTION(sqrt, sqrt)
-TENSOR_IMPLEMENT_BASIC_FUNCTION(ceil, ceil)
-TENSOR_IMPLEMENT_BASIC_FUNCTION(floor, floor)
-TENSOR_IMPLEMENT_BASIC_FUNCTION(abs, fabs)
-
+void THTensor_(fill)(THTensor *self, real value)
+{
+  TH_TENSOR_APPLY(self, self_data[i] = value;);
+}
 
 void THTensor_(zero)(THTensor *self)
 {
@@ -104,68 +78,6 @@ real THTensor_(sum)(THTensor *self)
   real sum = 0;
   TH_TENSOR_APPLY(self, sum += self_data[i];);
   return sum;
-}
-
-real THTensor_(mean)(THTensor *self)
-{
-  THArgCheck(THTensor_(nElement)(self) > 0, 1, "cannot average an empty tensor");
-  return THTensor_(sum)(self)/THTensor_(nElement)(self);
-}
-
-real THTensor_(var)(THTensor *self)
-{
-  real mean = THTensor_(mean)(self);
-  real sum = 0;
-  TH_TENSOR_APPLY(self, sum += (self_data[i] - mean)*(self_data[i] - mean););
-  sum /= (THTensor_(nElement)(self)-1);
-  return sum;
-}
-
-real THTensor_(std)(THTensor *self)
-{
-  return sqrt(THTensor_(var)(self));
-}
- 
-real THTensor_(norm)(THTensor *self, real value)
-{
-  real sum = 0;
-  if(value == 1)
-  {
-    TH_TENSOR_APPLY(self, sum += fabs(self_data[i]););
-    return sum;
-  }
-  else if(value == 2)
-  {
-    TH_TENSOR_APPLY(self, sum += self_data[i]*self_data[i];);
-    return sqrt(sum);
-  }
-  else
-  {
-    TH_TENSOR_APPLY(self, sum += pow(fabs(self_data[i]), value););
-    return pow(sum, 1.0/value);
-  }
-}
-
-real THTensor_(dist)(THTensor *self, THTensor *tensor, real value)
-{
-  real sum = 0;
-  if(value == 1)
-  {
-    TH_TENSOR_APPLY2(self, tensor, sum += fabs(self_data[i]-tensor_data[i]););
-    return sum;
-  }
-  else if(value == 2)
-  {
-    TH_TENSOR_APPLY2(self, tensor,
-                    real z = self_data[i]-tensor_data[i];
-                    sum += z*z;);
-    return sqrt(sum);
-  }
-  else
-  {
-    TH_TENSOR_APPLY2(self, tensor, sum += pow(fabs(self_data[i]-tensor_data[i]), value););
-    return pow(sum, 1.0/value);
-  }
 }
 
 void THTensor_(addmv)(THTensor *self, real alpha, int transpose, THTensor *mat, THTensor *vec)
@@ -242,5 +154,101 @@ void THTensor_(addmm)(THTensor *self, real alpha, int transpose1, THTensor *mat1
                  1,
                  THTensor_(data)(self), THTensor_(stride)(self, 1));
 }
+
+#if defined(TH_REAL_IS_FLOAT) || defined(TH_REAL_IS_DOUBLE)
+
+#define TENSOR_IMPLEMENT_BASIC_FUNCTION(NAME, CFUNC)           \
+  void THTensor_(NAME)(THTensor *self)                  \
+  {                                                            \
+    TH_TENSOR_APPLY(self, self_data[i] = CFUNC(self_data[i]);) \
+  }                                                            \
+
+#define TENSOR_IMPLEMENT_BASIC_FUNCTION_VALUE(NAME, CFUNC)              \
+  void THTensor_(NAME)(THTensor *self, real value)               \
+  {                                                                     \
+    TH_TENSOR_APPLY(self, self_data[i] = CFUNC(self_data[i], value););  \
+  }                                                                     \
+
+TENSOR_IMPLEMENT_BASIC_FUNCTION(log, log)
+TENSOR_IMPLEMENT_BASIC_FUNCTION(log1p, log1p)
+TENSOR_IMPLEMENT_BASIC_FUNCTION(exp, exp)
+TENSOR_IMPLEMENT_BASIC_FUNCTION(cos, cos)
+TENSOR_IMPLEMENT_BASIC_FUNCTION(acos, acos)
+TENSOR_IMPLEMENT_BASIC_FUNCTION(cosh, cosh)
+TENSOR_IMPLEMENT_BASIC_FUNCTION(sin, sin)
+TENSOR_IMPLEMENT_BASIC_FUNCTION(asin, asin)
+TENSOR_IMPLEMENT_BASIC_FUNCTION(sinh, sinh)
+TENSOR_IMPLEMENT_BASIC_FUNCTION(tan, tan)
+TENSOR_IMPLEMENT_BASIC_FUNCTION(atan, atan)
+TENSOR_IMPLEMENT_BASIC_FUNCTION(tanh, tanh)
+TENSOR_IMPLEMENT_BASIC_FUNCTION_VALUE(pow, pow)
+TENSOR_IMPLEMENT_BASIC_FUNCTION(sqrt, sqrt)
+TENSOR_IMPLEMENT_BASIC_FUNCTION(ceil, ceil)
+TENSOR_IMPLEMENT_BASIC_FUNCTION(floor, floor)
+TENSOR_IMPLEMENT_BASIC_FUNCTION(abs, fabs)
+
+real THTensor_(mean)(THTensor *self)
+{
+  THArgCheck(THTensor_(nElement)(self) > 0, 1, "cannot average an empty tensor");
+  return THTensor_(sum)(self)/THTensor_(nElement)(self);
+}
+
+real THTensor_(var)(THTensor *self)
+{
+  real mean = THTensor_(mean)(self);
+  real sum = 0;
+  TH_TENSOR_APPLY(self, sum += (self_data[i] - mean)*(self_data[i] - mean););
+  sum /= (THTensor_(nElement)(self)-1);
+  return sum;
+}
+
+real THTensor_(std)(THTensor *self)
+{
+  return sqrt(THTensor_(var)(self));
+}
+ 
+real THTensor_(norm)(THTensor *self, real value)
+{
+  real sum = 0;
+  if(value == 1)
+  {
+    TH_TENSOR_APPLY(self, sum += fabs(self_data[i]););
+    return sum;
+  }
+  else if(value == 2)
+  {
+    TH_TENSOR_APPLY(self, sum += self_data[i]*self_data[i];);
+    return sqrt(sum);
+  }
+  else
+  {
+    TH_TENSOR_APPLY(self, sum += pow(fabs(self_data[i]), value););
+    return pow(sum, 1.0/value);
+  }
+}
+
+real THTensor_(dist)(THTensor *self, THTensor *tensor, real value)
+{
+  real sum = 0;
+  if(value == 1)
+  {
+    TH_TENSOR_APPLY2(self, tensor, sum += fabs(self_data[i]-tensor_data[i]););
+    return sum;
+  }
+  else if(value == 2)
+  {
+    TH_TENSOR_APPLY2(self, tensor,
+                    real z = self_data[i]-tensor_data[i];
+                    sum += z*z;);
+    return sqrt(sum);
+  }
+  else
+  {
+    TH_TENSOR_APPLY2(self, tensor, sum += pow(fabs(self_data[i]-tensor_data[i]), value););
+    return pow(sum, 1.0/value);
+  }
+}
+
+#endif
 
 #endif

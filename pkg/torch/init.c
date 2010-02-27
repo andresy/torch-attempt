@@ -1,6 +1,6 @@
 #include "Storage.h"
 #include "Tensor.h"
-/* #include "TensorMath.h" */
+#include "TensorMath.h"
 
 #include "File.h"
 #include "DiskFile.h"
@@ -49,7 +49,14 @@ DLL_EXPORT int luaopen_libtorch(lua_State *L)
   torch_LongTensor_init(L);
   torch_FloatTensor_init(L);
   torch_DoubleTensor_init(L);
-/*  torch_TensorMath_init(L); */
+
+  torch_ByteTensorMath_init(L);
+  torch_CharTensorMath_init(L);
+  torch_ShortTensorMath_init(L);
+  torch_IntTensorMath_init(L);
+  torch_LongTensorMath_init(L);
+  torch_FloatTensorMath_init(L);
+  torch_DoubleTensorMath_init(L);
 
   torch_Timer_init(L);
   torch_File_init(L);

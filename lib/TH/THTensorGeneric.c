@@ -49,7 +49,8 @@ void THTensor_(resize)(THTensor *self, int nDimension, long *size)
     long stride = 1;
     self->size   = THRealloc(self->size,   sizeof(long)*nDimension);
     self->stride = THRealloc(self->stride, sizeof(long)*nDimension);
-    for(d = 0; d < nDimension; d++)
+    self->nDimension = nDimension;
+    for(d = nDimension-1; d >= 0; d--)
     {
       self->size[d] = size[d];
       self->stride[d] = stride;
@@ -84,7 +85,7 @@ void THTensor_(init)(THTensor *self, THStorage *storage, long storageOffset, int
 }
 
 /* Empty init */
-THTensor *THTensor_(new)()
+THTensor *THTensor_(new)(void)
 {
   THTensor* self = THAlloc(sizeof(THTensor));
   THTensor_(init)(self, NULL, 0, 0, NULL);
@@ -102,7 +103,7 @@ THTensor* THTensor_(newWithTensor)(THTensor *tensor)
 THTensor* THTensor_(newWithTensorNarrow)(THTensor *tensor, long firstIndex, long size)
 {
   THTensor *self;
-  int dimension = tensor->nDimension-1;
+  int dimension = 0;
 
   THArgCheck( (firstIndex >= 0) && (firstIndex < tensor->size[dimension]), 2, "out of range");
   THArgCheck( (size > 0) && (firstIndex+size <= tensor->size[dimension]), 3, "out of range");
@@ -117,7 +118,7 @@ THTensor* THTensor_(newWithTensorNarrow)(THTensor *tensor, long firstIndex, long
 THTensor* THTensor_(newWithTensorSelect)(THTensor *tensor, long sliceIndex)
 {
   THTensor *self;
-  int dimension = tensor->nDimension-1;
+  int dimension = 0;
   int d;
 
   THArgCheck((dimension >= 0) && (dimension < tensor->nDimension), 1, "out of range");
@@ -125,10 +126,12 @@ THTensor* THTensor_(newWithTensorSelect)(THTensor *tensor, long sliceIndex)
 
   self = THTensor_(newWithTensor)(tensor);
   self->storageOffset += sliceIndex*self->stride[dimension];
+  printf("SLICEIDX = %ld STRIDE = %ld\n", sliceIndex, self->stride[dimension]);
   for(d = dimension; d < self->nDimension-1; d++)
   {
     self->size[d] = tensor->size[d+1];
     self->stride[d] = tensor->stride[d+1];
+    printf("DIM %d = %ld\n", d, self->size[d]);
   }
   self->nDimension--;
 
@@ -235,14 +238,14 @@ long THTensor_(stride)(THTensor *self, int dim)
 
 THLongStorage *THTensor_(newSizeOf)(THTensor *self)
 {
-  THLongStorage *storage = THLongStorage_new(self->nDimension);
+  THLongStorage *storage = THLongStorage_newWithSize(self->nDimension);
   memcpy(THLongStorage_data(storage), self->size, sizeof(long)*self->nDimension);
   return storage;
 }
 
 THLongStorage *THTensor_(newStrideOf)(THTensor *self)
 {
-  THLongStorage *storage = THLongStorage_new(self->nDimension);
+  THLongStorage *storage = THLongStorage_newWithSize(self->nDimension);
   memcpy(THLongStorage_data(storage), self->stride, sizeof(long)*self->nDimension);
   return storage;
 }
@@ -361,11 +364,10 @@ real* THTensor_(data4d)(THTensor *self, long i0, long i1, long i2, long i3)
 
 long THTensor_(nElement)(THTensor *self)
 {
-  int nDimension = self->nDimension;
-  if(nDimension == 0)
+  if(self->nDimension == 0)
     return 0;
   else
-    return self->stride[self->nDimension-1]*self->size[nDimension-1];
+    return self->stride[0]*self->size[0];
 }
 
 void THTensor_(copy)(THTensor *self, THTensor *tensor)

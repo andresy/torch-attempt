@@ -2,37 +2,21 @@
 #define TH_GENERIC_FILE "THStorageGeneric.c"
 #else
 
-/* on pourrait peut-etre mettre ca dans TH/dev/THStorage.h */
-struct THStorageVTable
-{
-  real* (*data)(THStorage*);
-  long (*size)(THStorage*);
-
-  void (*retain)(THStorage*);
-  void (*copy)(THStorage*, THStorage*);
-  void (*resize)(THStorage*, long);
-  
-  void (*free)(THStorage*);
-};
-
 struct THStorage
 {
-    struct THStorageVTable *vtable;
     long size;
     int refcount;
     real *data;
+    int ismapped;
 };
 
-/* normal storages */
-struct THStorageVTable THStorage_(vtable);
-
-THStorage* THStorage_(new)()
+THStorage* THStorage_(new)(void)
 {
   THStorage *self = THAlloc(sizeof(THStorage));
-  self->vtable = &THStorage_(vtable);
   self->size = 0;
   self->refcount = 1;
   self->data = NULL;
+  self->ismapped = 0;
   return self;
 }
 
@@ -63,6 +47,9 @@ void THStorage_(fill)(THStorage *self, real value)
 
 void THStorage_(resize)(THStorage *self, long size)
 {
+  if(self->ismapped)
+    THError("File mapped storages cannot be resized");
+
   if(size != self->size)
   {
     self->size = size;
@@ -77,7 +64,7 @@ void THStorage_(copy)(THStorage *self, THStorage *storage)
   THArgCheck(self->size == storage->size, 2, "inconsistent storage sizes");
   
   for(i = 0; i < self->size; i++)
-    self->data[i] = self->data[i];
+    self->data[i] = storage->data[i];
 }
 
 void THStorage_(retain)(THStorage *self)
@@ -101,32 +88,32 @@ void THStorage_(free)(THStorage *self)
 {
   if(--self->refcount == 0)
   {
-    free(self->data);
+#if defined(_WIN32) || defined(HAVE_MMAP)
+    if(self->ismapped)
+    {
+#ifdef _WIN32
+      if(!UnmapViewOfFile((LPINT)self->data))
+#else
+      if (munmap(self->data, self->size*sizeof(real)))
+#endif
+          THError("could not unmap the shared memory file");
+    }
+    else
+#endif
+    {
+      free(self->data);
+    }
     free(self);
   }
 }
 
-struct THStorageVTable THStorage_(vtable) = {
-  THStorage_(data),
-  THStorage_(size),
-  THStorage_(retain),
-  THStorage_(copy),
-  THStorage_(resize),
-  THStorage_(free)
-};
-
 /* mapped storages */
 #if defined(_WIN32) || defined(HAVE_MMAP)
-
-struct THStorageVTable THMappedStorage_(vtable);
 
 THStorage* THStorage_(newWithMapping)(const char *filename, int isshared)
 {
   THStorage *self = THAlloc(sizeof(THStorage));
   long size;
-
-  /* virtual table */
-  self->vtable = &THMappedStorage_(vtable);
 
   /* check size */
   FILE *f = fopen(filename, "rb");
@@ -230,26 +217,6 @@ THStorage* THStorage_(newWithMapping)(const char *filename, int isshared)
   return self;
 }
 
-void THMappedStorage_(resize)(THStorage *self, long size)
-{
-  THError("File mapped storages cannot be resized");
-}
-
-void THMappedStorage_(free)(THStorage *self)
-{
-#if defined(_WIN32) || defined(HAVE_MMAP)
-  if(--self->refcount == 0)
-  {
-#ifdef _WIN32
-    if(!UnmapViewOfFile((LPINT)self->data))
-#else
-    if (munmap(self->data, self->size*sizeof(real)))
-#endif
-      THError("could not unmap the shared memory file");
-  }
-#endif
-}
-
 #else
 
 THStorage* THStorage_(newWithMapping)(const char *filename, int isshared)
@@ -259,49 +226,5 @@ THStorage* THStorage_(newWithMapping)(const char *filename, int isshared)
 }
 
 #endif
-
-#if defined(_WIN32) || defined(HAVE_MMAP)
-
-struct THStorageVTable THMappedStorage_(vtable) = {
-  THStorage_(data),
-  THStorage_(size),
-  THStorage_(retain),
-  THStorage_(copy),
-  THMappedStorage_(resize),
-  THMappedStorage_(free)
-};
-
-#endif
-
-/* ze vtable */
-real* THStorage_(vtable_data)(THStorage *self)
-{
-  return self->vtable->data(self);
-}
-
-long THStorage_(vtable_size)(THStorage *self)
-{
-  return self->vtable->size(self);
-}
-
-void THStorage_(vtable_retain)(THStorage *self)
-{
-  self->vtable->retain(self);
-}
-
-void THStorage_(vtable_copy)(THStorage *self, THStorage *src)
-{
-  self->vtable->copy(self, src);
-}
-
-void THStorage_(vtable_resize)(THStorage *self, long size)
-{
-  self->vtable->resize(self, size);
-}
-
-void THStorage_(vtable_free)(THStorage *self)
-{
-  self->vtable->free(self);
-}
 
 #endif

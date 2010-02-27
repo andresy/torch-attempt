@@ -10,7 +10,7 @@ local function Storage__printformat(self)
          end
       end
    end
-   local tensor = torch.Tensor(torch.DoubleStorage(self:size()):copy(self), 1, self:size()):abs()
+   local tensor = torch.DoubleTensor(torch.DoubleStorage(self:size()):copy(self), 1, self:size()):abs()
    local expMin = tensor:min()
    if expMin ~= 0 then
       expMin = math.floor(math.log10(expMin)) + 1
@@ -110,7 +110,7 @@ local function Tensor__printMatrix(self, indent)
          str = str .. string.format('%g', scale) .. ' *\n ' .. indent
       end
       for l=1,self:size(1) do
-         local row = self:select(1, l)
+         local row = self:select(l)
          for c=firstColumn,lastColumn do
             str = str .. string.format(format, row[c]/scale)
             if c == lastColumn then
@@ -137,12 +137,12 @@ local function Tensor__printTensor(self)
    local str = ''
    local finished
    counter:fill(1)
-   counter[1] = 0
+   counter[self:nDimension()-2] = 0
    while true do
-      for i=1,self:nDimension()-2 do
+      for i=self:nDimension()-2,1,-1 do
          counter[i] = counter[i] + 1
          if counter[i] > self:size(i) then
-            if i == self:nDimension()-2 then
+            if i == 1 then
                finished = true
                break
             end
@@ -154,14 +154,14 @@ local function Tensor__printTensor(self)
       if finished then
          break
       end
---      print(counter)
+
       if str ~= '' then
          str = str .. '\n'
       end
       str = str .. '('
       local tensor = self
       for i=1,self:nDimension()-2 do
-         tensor = tensor:select(1, counter[i])
+         tensor = tensor:select(counter[i])
          str = str .. counter[i] .. ','
       end
       str = str .. '.,.) = \n'
@@ -175,7 +175,7 @@ local function Tensor__tostring(self)
    if self:nDimension() == 0 then
       str = str .. '[' .. torch.typename(self) .. ' with no dimension]\n'
    else
-      local tensor = torch.Tensor():resize(self:size()):copy(self)
+      local tensor = torch.DoubleTensor():resize(self:size()):copy(self)
       if tensor:nDimension() == 1 then
          local format,scale,sz = Storage__printformat(tensor:storage())
          if scale then
