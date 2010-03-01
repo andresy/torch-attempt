@@ -1,4 +1,4 @@
 #include "THBlas.h"
 
-#include "THBlasGeneric.c"
+#include "generic/THBlas.c"
 #include "THGenerateAllTypes.h"

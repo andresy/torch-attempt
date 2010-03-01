@@ -1,5 +1,5 @@
 #ifndef TH_GENERIC_FILE
-#define TH_GENERIC_FILE "THBlasGeneric.c"
+#define TH_GENERIC_FILE "generic/THBlas.c"
 #else
 
 void THBlas_(swap)(long n, real *x, long incx, real *y, long incy)

@@ -4,5 +4,5 @@
 #include "THTensorRandom.h"
 #include "THRandom.h"
 
-#include "THLabGeneric.c"
+#include "generic/THLab.c"
 #include "THGenerateAllTypes.h"

@@ -6,7 +6,7 @@
 #define THTensor          TH_CONCAT_3(TH,Real,Tensor)
 #define THTensor_(NAME)   TH_CONCAT_4(TH,Real,Tensor_,NAME)
 
-#include"THTensorGeneric.h"
+#include "generic/THTensor.h"
 #include "THGenerateAllTypes.h"
 
 #endif

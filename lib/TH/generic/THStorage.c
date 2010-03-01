@@ -1,5 +1,5 @@
 #ifndef TH_GENERIC_FILE
-#define TH_GENERIC_FILE "THStorageGeneric.c"
+#define TH_GENERIC_FILE "generic/THStorage.c"
 #else
 
 struct THStorage

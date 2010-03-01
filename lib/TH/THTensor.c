@@ -1,4 +1,4 @@
 #include "THTensor.h"
 
-#include"THTensorGeneric.c"
+#include "generic/THTensor.c"
 #include "THGenerateAllTypes.h"

@@ -1,5 +1,5 @@
 #ifndef TH_GENERIC_FILE
-#define TH_GENERIC_FILE "THStorageGeneric.h"
+#define TH_GENERIC_FILE "generic/THStorage.h"
 #else
 
 /* ils appellent tous la vtable... THStorage est un module apres tout.

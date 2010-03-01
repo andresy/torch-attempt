@@ -1,5 +1,5 @@
 #ifndef TH_GENERIC_FILE
-#define TH_GENERIC_FILE "THTensorGeneric.h"
+#define TH_GENERIC_FILE "generic/THTensor.h"
 #else
 
 typedef struct THTensor THTensor;

@@ -2,5 +2,5 @@
 #include "THRandom.h"
 #include "THTensorApply.h"
 
-#include "THTensorRandomGeneric.c"
+#include "generic/THTensorRandom.c"
 #include "THGenerateAllTypes.h"

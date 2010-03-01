@@ -1,5 +1,5 @@
 #ifndef TH_GENERIC_FILE
-#define TH_GENERIC_FILE "THLabGeneric.c"
+#define TH_GENERIC_FILE "generic/THLab.c"
 #else
 
 void THLab_(numel)(THTensor *t, int *n_)

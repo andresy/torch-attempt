@@ -3,7 +3,7 @@
 
 #include "THTensor.h"
 
-#include "THTensorRandomGeneric.h"
+#include "generic/THTensorRandom.h"
 #include "THGenerateAllTypes.h"
 
 #endif

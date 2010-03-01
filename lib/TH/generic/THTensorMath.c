@@ -1,5 +1,5 @@
 #ifndef TH_GENERIC_FILE
-#define TH_GENERIC_FILE "THTensorMathGeneric.c"
+#define TH_GENERIC_FILE "generic/THTensorMath.c"
 #else
 
 void THTensor_(fill)(THTensor *self, real value)

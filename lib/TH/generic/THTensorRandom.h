@@ -1,5 +1,5 @@
 #ifndef TH_GENERIC_FILE
-#define TH_GENERIC_FILE "THTensorRandomGeneric.h"
+#define TH_GENERIC_FILE "generic/THTensorRandom.h"
 #else
 
 TH_API void THTensor_(random)(THTensor *self);

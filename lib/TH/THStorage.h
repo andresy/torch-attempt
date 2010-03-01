@@ -20,7 +20,7 @@
 #define THStorage        TH_CONCAT_3(TH,Real,Storage)
 #define THStorage_(NAME) TH_CONCAT_4(TH,Real,Storage_,NAME)
 
-#include "THStorageGeneric.h"
+#include "generic/THStorage.h"
 #include "THGenerateAllTypes.h"
 
 #endif

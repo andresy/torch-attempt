@@ -1,5 +1,5 @@
 #ifndef TH_GENERIC_FILE
-#define TH_GENERIC_FILE "THTensorGeneric.c"
+#define TH_GENERIC_FILE "generic/THTensor.c"
 #else
 
 /* crap: avec un data, si storage change on est de la baise */

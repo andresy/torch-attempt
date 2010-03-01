@@ -5,7 +5,7 @@
 #include "THBlas.h"
 #include "THTensorApply.h"
 
-#include "THTensorMathGeneric.h"
+#include "generic/THTensorMath.h"
 #include "THGenerateAllTypes.h"
 
 #endif
