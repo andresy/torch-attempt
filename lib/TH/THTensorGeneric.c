@@ -126,12 +126,10 @@ THTensor* THTensor_(newWithTensorSelect)(THTensor *tensor, long sliceIndex)
 
   self = THTensor_(newWithTensor)(tensor);
   self->storageOffset += sliceIndex*self->stride[dimension];
-  printf("SLICEIDX = %ld STRIDE = %ld\n", sliceIndex, self->stride[dimension]);
   for(d = dimension; d < self->nDimension-1; d++)
   {
     self->size[d] = tensor->size[d+1];
     self->stride[d] = tensor->stride[d+1];
-    printf("DIM %d = %ld\n", d, self->size[d]);
   }
   self->nDimension--;
 
@@ -290,49 +288,49 @@ void THTensor_(set1d)(THTensor *self, long x0, real value)
 
 real THTensor_(get1d)(THTensor *self, long x0)
 {
-  THArgCheck(self->nDimension == 1, 1, "tensor must have one dimension");
+  THArgCheck(self->nDimension >= 1, 1, "tensor must have (at least) one dimension");
   THArgCheck( (x0 >= 0) && (x0 < self->size[0]), 2, "out of range");
   return (THStorage_(data)(self->storage)+self->storageOffset)[x0];
 }
 
 void THTensor_(set2d)(THTensor *self, long x0, long x1, real value)
 {
-  THArgCheck(self->nDimension == 2, 1, "tensor must have two dimensions");
+  THArgCheck(self->nDimension >= 2, 1, "tensor must have (at least) two dimensions");
   THArgCheck((x0 >= 0) && (x0 < self->size[0]) && (x1 >= 0) && (x1 < self->size[1]), 2, "out of range");
   (THStorage_(data)(self->storage)+self->storageOffset)[x0+x1*self->stride[1]] = value;
 }
 
 real THTensor_(get2d)(THTensor *self, long x0, long x1)
 {
-  THArgCheck(self->nDimension == 2, 1, "tensor must have two dimensions");
+  THArgCheck(self->nDimension >= 2, 1, "tensor must have (at least) two dimensions");
   THArgCheck((x0 >= 0) && (x0 < self->size[0]) && (x1 >= 0) && (x1 < self->size[1]), 2, "out of range");
   return (THStorage_(data)(self->storage)+self->storageOffset)[x0+x1*self->stride[1]];
 }
 
 void THTensor_(set3d)(THTensor *self, long x0, long x1, long x2, real value)
 {
-  THArgCheck(self->nDimension == 3, 1, "tensor must have three dimensions");
+  THArgCheck(self->nDimension >= 3, 1, "tensor must have (at least) three dimensions");
   THArgCheck( (x0 >= 0) && (x0 < self->size[0]) && (x1 >= 0) && (x1 < self->size[1]) && (x2 >= 0) && (x2 < self->size[2]), 2, "out of range");
   (THStorage_(data)(self->storage)+self->storageOffset)[x0+x1*self->stride[1]+x2*self->stride[2]] = value;
 }
 
 real THTensor_(get3d)(THTensor *self, long x0, long x1, long x2)
 {
-  THArgCheck(self->nDimension == 3, 1, "tensor must have three dimensions");
+  THArgCheck(self->nDimension >= 3, 1, "tensor must have (at least) three dimensions");
   THArgCheck( (x0 >= 0) && (x0 < self->size[0]) && (x1 >= 0) && (x1 < self->size[1]) && (x2 >= 0) && (x2 < self->size[2]), 2, "out of range");
   return (THStorage_(data)(self->storage)+self->storageOffset)[x0+x1*self->stride[1]+x2*self->stride[2]];
 }
 
 void THTensor_(set4d)(THTensor *self, long x0, long x1, long x2, long x3, real value)
 {
-  THArgCheck(self->nDimension == 4, 1, "tensor must have four dimensions");
+  THArgCheck(self->nDimension >= 4, 1, "tensor must have (at least) four dimensions");
   THArgCheck((x0 >= 0) && (x0 < self->size[0]) && (x1 >= 0) && (x1 < self->size[1]) && (x2 >= 0) && (x2 < self->size[2]) && (x3 >= 0) && (x3 < self->size[3]), 2, "out of range");
   (THStorage_(data)(self->storage)+self->storageOffset)[x0+x1*self->stride[1]+x2*self->stride[2]+x3*self->stride[3]] = value;
 }
 
 real THTensor_(get4d)(THTensor *self, long x0, long x1, long x2, long x3)
 {
-  THArgCheck(self->nDimension == 4, 1, "tensor must have four dimensions");
+  THArgCheck(self->nDimension >= 4, 1, "tensor must have (at least) four dimensions");
   THArgCheck((x0 >= 0) && (x0 < self->size[0]) && (x1 >= 0) && (x1 < self->size[1]) && (x2 >= 0) && (x2 < self->size[2]) && (x3 >= 0) && (x3 < self->size[3]), 2, "out of range");
   return (THStorage_(data)(self->storage)+self->storageOffset)[x0+x1*self->stride[1]+x2*self->stride[2]+x3*self->stride[3]];
 }

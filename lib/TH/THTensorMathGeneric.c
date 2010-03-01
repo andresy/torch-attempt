@@ -88,20 +88,20 @@ void THTensor_(addmv)(THTensor *self, real alpha, int transpose, THTensor *mat, 
 
   if(transpose)
   {
-    THArgCheck(THTensor_(size)(mat, 1) == THTensor_(size)(vec, 1), 2, "inconsistent matrix/vector sizes");
-    THArgCheck(THTensor_(size)(mat, 2) == THTensor_(size)(self, 1), 1, "inconsistent matrix/vector sizes");
+    THArgCheck(THTensor_(size)(mat, 0) == THTensor_(size)(vec, 0), 2, "inconsistent matrix/vector sizes");
+    THArgCheck(THTensor_(size)(mat, 1) == THTensor_(size)(self, 0), 1, "inconsistent matrix/vector sizes");
   }
   else
   {
-    THArgCheck(THTensor_(size)(mat, 2) == THTensor_(size)(vec, 1), 2, "inconsistent matrix/vector sizes");
-    THArgCheck(THTensor_(size)(mat, 1) == THTensor_(size)(self, 1), 1, "inconsistent matrix/vector sizes");
+    THArgCheck(THTensor_(size)(mat, 1) == THTensor_(size)(vec, 0), 2, "inconsistent matrix/vector sizes");
+    THArgCheck(THTensor_(size)(mat, 0) == THTensor_(size)(self, 0), 1, "inconsistent matrix/vector sizes");
   }
 
   /* BLAS is column-ordered */
   THBlas_(gemv)((transpose ? 'n' : 't'),
                 THTensor_(size)(mat, 1), THTensor_(size)(mat, 0),
                 alpha,
-                THTensor_(data)(mat), THTensor_(stride)(mat, 1),
+                THTensor_(data)(mat), THTensor_(stride)(mat, 0),
                 THTensor_(data)(vec), 1,
                 1,
                 THTensor_(data)(self), 1);
@@ -112,15 +112,15 @@ void THTensor_(addr)(THTensor *self, real alpha, THTensor *vec1, THTensor *vec2)
   THArgCheck(THTensor_(nDimension)(self) == 2, 1, "matrix expected");
   THArgCheck(THTensor_(nDimension)(vec1) == 1, 3, "vector expected");
   THArgCheck(THTensor_(nDimension)(vec2) == 1, 4, "vector expected");
-  THArgCheck(THTensor_(size)(self, 0) == THTensor_(size)(vec1, 1), 1, "inconsistent matrix/vector sizes");
-  THArgCheck(THTensor_(size)(self, 1) == THTensor_(size)(vec2, 1), 1, "inconsistent matrix/vector sizes");
+  THArgCheck(THTensor_(size)(self, 0) == THTensor_(size)(vec1, 0), 1, "inconsistent matrix/vector sizes");
+  THArgCheck(THTensor_(size)(self, 1) == THTensor_(size)(vec2, 0), 1, "inconsistent matrix/vector sizes");
 
   /* BLAS is column-ordered */
   THBlas_(ger)(THTensor_(size)(self, 1), THTensor_(size)(self, 0),
                alpha,
                THTensor_(data)(vec2), 1,
                THTensor_(data)(vec1), 1,
-               THTensor_(data)(self), THTensor_(stride)(self, 1));
+               THTensor_(data)(self), THTensor_(stride)(self, 0));
 }
 
 void THTensor_(addmm)(THTensor *self, real alpha, int transpose1, THTensor *mat1, int transpose2, THTensor *mat2)
@@ -149,10 +149,10 @@ void THTensor_(addmm)(THTensor *self, real alpha, int transpose1, THTensor *mat1
                  THTensor_(size)(self, 0),
                  (transpose2 ? THTensor_(size)(mat2, 1) : THTensor_(size)(mat2, 0)),
                  alpha,
-                 THTensor_(data)(mat2), THTensor_(stride)(mat2, 1),
-                 THTensor_(data)(mat1), THTensor_(stride)(mat1, 1),
+                 THTensor_(data)(mat2), THTensor_(stride)(mat2, 0),
+                 THTensor_(data)(mat1), THTensor_(stride)(mat1, 0),
                  1,
-                 THTensor_(data)(self), THTensor_(stride)(self, 1));
+                 THTensor_(data)(self), THTensor_(stride)(self, 0));
 }
 
 #if defined(TH_REAL_IS_FLOAT) || defined(TH_REAL_IS_DOUBLE)

@@ -118,10 +118,6 @@ static int torch_(Tensor_select)(lua_State *L)
   THTensor *src = luaT_checkudata(L, 1, torch_(Tensor_id));
   long sliceIndex = luaL_checklong(L, 2)-1;
   THTensor *tensor = THTensor_(newWithTensorSelect)(src, sliceIndex);
-  int i;
-  for(i = 0; i < THTensor_(nDimension)(tensor); i++)
-    printf("NOW DIM %d = %ld\n", i, THTensor_(size)(tensor, i));
-
   luaT_pushudata(L, tensor, torch_(Tensor_id));
   return 1;
 }
@@ -296,10 +292,6 @@ static void torch_(Tensor_c_readTensorStorageSize)(lua_State *L, int index, int 
 static int torch_(Tensor_apply)(lua_State *L)
 {
   THTensor *tensor = luaT_checkudata(L, 1, torch_(Tensor_id));
-
-  int i;
-  for(i = 0; i < THTensor_(nDimension)(tensor); i++)
-    printf("APPLY DIM %d = %ld, NELEMENT = %ld\n", i, THTensor_(size)(tensor, i), THTensor_(nElement)(tensor));
 
   luaL_checktype(L, 2, LUA_TFUNCTION);
   lua_settop(L, 2);

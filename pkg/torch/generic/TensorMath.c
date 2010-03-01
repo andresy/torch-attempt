@@ -72,6 +72,15 @@ static int torch_(Tensor_dist)(lua_State *L)
 
 TENSOR_IMPLEMENT_BASIC_WRAPPER(zero)
 
+static int torch_(Tensor_fill)(lua_State *L)
+{
+  THTensor *tensor = luaT_checkudata(L, 1, torch_(Tensor_id));
+  real value = luaL_checknumber(L, 2);
+  TH_TENSOR_APPLY(tensor, tensor_data[i] = value;);
+  lua_settop(L, 1);
+  return 1;
+}
+
 static int torch_(Tensor_add)(lua_State *L)
 {
   THTensor *tensor = luaT_checkudata(L, 1, torch_(Tensor_id));
@@ -392,6 +401,7 @@ static const struct luaL_Reg torch_(Tensor__) [] = {
   {"dist", torch_(Tensor_dist)},
 #endif
   {"zero", torch_(Tensor_zero)},
+  {"fill", torch_(Tensor_fill)},
   {"add", torch_(Tensor_add)},
   {"mul", torch_(Tensor_mul)},
   {"cmul", torch_(Tensor_cmul)},

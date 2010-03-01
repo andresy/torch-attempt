@@ -192,13 +192,13 @@ void THBlas_(gemv)(char trans, long m, long n, real alpha, real *a, long lda, re
 
     if( (trans == 'T') || (trans == 't') )
     {
-      for(j = 0; j < n; j++)
+      for(i = 0; i < n; i++)
       {
         real sum = 0;
-        real *column_ = a+lda*j;
-        for(i = 0; i < m; i++)
-          sum += x[i*incx]*column_[i];
-        y[j*incy] = beta*y[j*incy] + alpha*sum;
+        real *row_ = a+lda*i;
+        for(j = 0; j < m; j++)
+          sum += x[j*incx]*row_[j];
+        y[i*incy] = beta*y[i*incy] + alpha*sum;
       }
     }
     else
@@ -255,10 +255,13 @@ void THBlas_(ger)(long m, long n, real alpha, real *x, long incx, real *y, long 
 
 void THBlas_(gemm)(char transa, char transb, long m, long n, long k, real alpha, real *a, long lda, real *b, long ldb, real beta, real *c, long ldc)
 {
+  int transa_ = ((transa == 't') || (transa == 'T'));
+  int transb_ = ((transb == 't') || (transb == 'T'));
+
   if(n == 1)
     ldc = m;
 
-  if(transa)
+  if(transa_)
   {
     if(m == 1)
       lda = k;
@@ -269,7 +272,7 @@ void THBlas_(gemm)(char transa, char transb, long m, long n, long k, real alpha,
       lda = m;
   }
 
-  if(transb)
+  if(transb_)
   {
     if(k == 1)
       ldb = n;
@@ -302,7 +305,7 @@ void THBlas_(gemm)(char transa, char transb, long m, long n, long k, real alpha,
 #endif
   {
     long i, j, l;
-    if(!transa && !transb)
+    if(!transa_ && !transb_)
     {
       real *a_ = a;
       for(i = 0; i < m; i++)
@@ -319,7 +322,7 @@ void THBlas_(gemm)(char transa, char transb, long m, long n, long k, real alpha,
         a_++;
       }
     }
-    else if(transa && !transb)
+    else if(transa_ && !transb_)
     {
       real *a_ = a;
       for(i = 0; i < m; i++)
@@ -336,7 +339,7 @@ void THBlas_(gemm)(char transa, char transb, long m, long n, long k, real alpha,
         a_ += lda;
       }
     }
-    else if(!transa && transb)
+    else if(!transa_ && transb_)
     {
       real *a_ = a;
       for(i = 0; i < m; i++)
