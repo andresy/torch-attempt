@@ -71,7 +71,7 @@ static int torch_(Tensor_new)(lua_State *L)
   torch_(Tensor_c_readTensorStorageSize)(L, 1, 1, 1, 1,
                                                &storage, &storageOffset, &size);
 
-  tensor = THTensor_(newWithStorage)(storage, storageOffset, THLongStorage_size(size), THLongStorage_data(size));
+  tensor = THTensor_(newWithStorage)(storage, storageOffset, size);
   THLongStorage_free(size);
 
   luaT_pushudata(L, tensor, torch_(Tensor_id));
@@ -95,7 +95,7 @@ static int torch_(Tensor_resize)(lua_State *L)
 
   torch_(Tensor_c_readSize)(L, 2, &size);
 
-  THTensor_(resize)(tensor, THLongStorage_size(size), THLongStorage_data(size));
+  THTensor_(resize)(tensor, size);
   THLongStorage_free(size);
 
   lua_settop(L, 1);
@@ -432,7 +432,7 @@ static int torch_(Tensor_read)(lua_State *L)
   lua_call(L, 1, 1);
   storage = luaT_toudata(L, -1, torch_(Storage_id));
 
-  THTensor_(init)(self, storage, storageOffset, nDimension, THLongStorage_data(size));
+  THTensor_(init)(self, storage, storageOffset, size);
 
   return 0;
 }

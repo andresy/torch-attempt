@@ -18,8 +18,6 @@ THStorage* THStorage_(newWithSize2)(real, real);
 THStorage* THStorage_(newWithSize3)(real, real, real);
 THStorage* THStorage_(newWithSize4)(real, real, real, real);
 
-THStorage* THStorage_(newWithData)(real *data);
-
 THStorage* THStorage_(newWithMapping)(const char*, int);
 
 real* THStorage_(data)(THStorage*);

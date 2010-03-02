@@ -9,18 +9,16 @@ void THLab_(numel)(THTensor *t, int *n_)
 
 void THLab_(max)(THTensor *t, int dimension, THTensor *values_, THLongTensor *indices_)
 {
-  long *dim;
+  THLongStorage *dim;
   long i;
 
   THArgCheck(dimension >= 0 && dimension < THTensor_(nDimension)(t), 2, "dimension out of range");
 
-  dim = THAlloc(sizeof(long)*THTensor_(nDimension)(t));
-  for(i = 0; i < THTensor_(nDimension)(t); i++)
-    dim[i] = THTensor_(size)(t, i);
-  dim[dimension] = 1;
-  THTensor_(resize)(values_, THTensor_(nDimension)(t), dim);
-  THLongTensor_resize(indices_, THTensor_(nDimension)(t), dim);
-  THFree(dim);
+  dim = THTensor_(newSizeOf)(t);
+  THLongStorage_set(dim, dimension, 1);
+  THTensor_(resize)(values_, dim);
+  THLongTensor_resize(indices_, dim);
+  THLongStorage_free(dim);
 
   TH_TENSOR_DIM_APPLY3(real, Real, t, real, Real, values_, long, Long, indices_, dimension,
                        long theIndex = 0;
@@ -40,18 +38,16 @@ void THLab_(max)(THTensor *t, int dimension, THTensor *values_, THLongTensor *in
 
 void THLab_(min)(THTensor *t, int dimension, THTensor *values_, THLongTensor *indices_)
 {
-  long *dim;
+  THLongStorage *dim;
   long i;
 
   THArgCheck(dimension >= 0 && dimension < THTensor_(nDimension)(t), 2, "dimension out of range");
 
-  dim = THAlloc(sizeof(long)*THTensor_(nDimension)(t));
-  for(i = 0; i < THTensor_(nDimension)(t); i++)
-    dim[i] = THTensor_(size)(t, i);
-  dim[dimension] = 1;
-  THTensor_(resize)(values_, THTensor_(nDimension)(t), dim);
-  THLongTensor_resize(indices_, THTensor_(nDimension)(t), dim);
-  THFree(dim);
+  dim = THTensor_(newSizeOf)(t);
+  THLongStorage_set(dim, dimension, 1);
+  THTensor_(resize)(values_, dim);
+  THLongTensor_resize(indices_, dim);
+  THLongStorage_free(dim);
 
   TH_TENSOR_DIM_APPLY3(real, Real, t, real, Real, values_, long, Long, indices_, dimension,
                        long theIndex = 0;
@@ -72,17 +68,14 @@ void THLab_(min)(THTensor *t, int dimension, THTensor *values_, THLongTensor *in
 
 void THLab_(sum)(THTensor *t, int dimension, THTensor *r_)
 {
-  long *dim;
-  long i;
+  THLongStorage *dim;
 
   THArgCheck(dimension >= 0 && dimension < THTensor_(nDimension)(t), 2, "dimension out of range");
   
-  dim = THAlloc(sizeof(long)*THTensor_(nDimension)(t));
-  for(i = 0; i < THTensor_(nDimension)(t); i++)
-    dim[i] = THTensor_(size)(t, i);
-  dim[dimension] = 1;
-  THTensor_(resize)(r_, THTensor_(nDimension)(t), dim);
-  THFree(dim);
+  dim = THTensor_(newSizeOf)(t);
+  THLongStorage_set(dim, dimension, 1);
+  THTensor_(resize)(r_, dim);
+  THLongStorage_free(dim);
 
   TH_GEN_TENSOR_DIM_APPLY2(t, r_, dimension,
                            real sum = 0;
@@ -94,18 +87,15 @@ void THLab_(sum)(THTensor *t, int dimension, THTensor *r_)
 
 void THLab_(prod)(THTensor *t, int dimension, THTensor *r_)
 {
-  long *dim;
-  long i;
+  THLongStorage *dim;
 
   THArgCheck(dimension >= 0 && dimension < THTensor_(nDimension)(t), 2, "dimension out of range");
-  
-  dim = THAlloc(sizeof(long)*THTensor_(nDimension)(t));
-  for(i = 0; i < THTensor_(nDimension)(t); i++)
-    dim[i] = THTensor_(size)(t, i);
-  dim[dimension] = 1;
-  THTensor_(resize)(r_, THTensor_(nDimension)(t), dim);
-  THFree(dim);
 
+  dim = THTensor_(newSizeOf)(t);
+  THLongStorage_set(dim, dimension, 1);
+  THTensor_(resize)(r_, dim);
+  THLongStorage_free(dim);
+  
   TH_GEN_TENSOR_DIM_APPLY2(t, r_, dimension,
                            real prod = 1;
                            long i;
@@ -205,15 +195,15 @@ void THLab_(cross)(THTensor *a, THTensor *b, int dimension, THTensor *r_)
                            r__data[2*r__stride] = a_data[0*a_stride]*b_data[1*b_stride] - a_data[1*a_stride]*b_data[0*b_stride];);
 }
 
-void THLab_(zeros)(int nDimension, long *size, THTensor *r_)
+void THLab_(zeros)(THLongStorage *size, THTensor *r_)
 {
-  THTensor_(resize)(r_, nDimension, size);
+  THTensor_(resize)(r_, size);
   THTensor_(zero)(r_);
 }
 
-void THLab_(ones)(int nDimension, long *size, THTensor *r_)
+void THLab_(ones)(THLongStorage *size, THTensor *r_)
 {
-  THTensor_(resize)(r_, nDimension, size);
+  THTensor_(resize)(r_, size);
   THTensor_(fill)(r_, 1);
 }
 
@@ -315,9 +305,9 @@ void THLab_(randperm)(long n, THTensor *r_)
   }
 }
 
-void THLab_(reshape)(THTensor *t, int nDimension, long *size, THTensor *r_)
+void THLab_(reshape)(THTensor *t, THLongStorage *size, THTensor *r_)
 {
-  THTensor_(resize)(r_, nDimension, size);
+  THTensor_(resize)(r_, size);
   THTensor_(copy)(r_, t);
 }
 
@@ -377,12 +367,9 @@ void THLab_(sort)(THTensor *t, int dimension, int descendingOrder, THTensor *rt_
   THTensor_(copy)(rt_, t);
 
   {
-    long i;
-    int nDimension = THTensor_(nDimension)(t);
-    long *size = THAlloc(sizeof(nDimension));
-    for(i = 0; i < nDimension; i++)
-      size[i] = THTensor_(size)(t, i);
-    THLongTensor_resize(ri_, nDimension, size);
+    THLongStorage *size = THTensor_(newSizeOf)(t);
+    THLongTensor_resize(ri_, size);
+    THLongStorage_free(size);
   }
 
   if(descendingOrder)
@@ -493,17 +480,14 @@ LAB_IMPLEMENT_BASIC_FUNCTION(abs,fabs)
 
 void THLab_(mean)(THTensor *t, int dimension, THTensor *r_)
 {
-  long *dim;
-  long i;
+  THLongStorage *dim;
 
   THArgCheck(dimension >= 0 && dimension < THTensor_(nDimension)(t), 2, "invalid dimension");
 
-  dim = THAlloc(sizeof(long)*THTensor_(nDimension)(t));
-  for(i = 0; i < THTensor_(nDimension)(t); i++)
-    dim[i] = THTensor_(size)(t, i);
-  dim[dimension] = 1;
-  THTensor_(resize)(r_, THTensor_(nDimension)(t), dim);
-  THFree(dim);
+  dim = THTensor_(newSizeOf)(t);
+  THLongStorage_set(dim, dimension, 1);
+  THTensor_(resize)(r_, dim);
+  THLongStorage_free(dim);
 
   TH_GEN_TENSOR_DIM_APPLY2(t, r_, dimension,
                            real sum = 0;
@@ -515,17 +499,14 @@ void THLab_(mean)(THTensor *t, int dimension, THTensor *r_)
 
 void THLab_(std)(THTensor *t, int dimension, int flag, THTensor *r_)
 {
-  long *dim;
-  int i;
+  THLongStorage *dim;
 
   THArgCheck(dimension >= 0 && dimension < THTensor_(nDimension)(t), 3, "invalid dimension");
 
-  dim = THAlloc(sizeof(long)*THTensor_(nDimension)(t));
-  for(i = 0; i < THTensor_(nDimension)(t); i++)
-    dim[i] = THTensor_(size)(t, i);
-  dim[dimension] = 1;
-  THTensor_(resize)(r_, THTensor_(nDimension)(t), dim);
-  THFree(dim);
+  dim = THTensor_(newSizeOf)(t);
+  THLongStorage_set(dim, dimension, 1);
+  THTensor_(resize)(r_, dim);
+  THLongStorage_free(dim);
 
   TH_GEN_TENSOR_DIM_APPLY2(t, r_, dimension,
                            real sum = 0;
@@ -558,17 +539,14 @@ void THLab_(std)(THTensor *t, int dimension, int flag, THTensor *r_)
 
 void THLab_(var)(THTensor *t, int dimension, int flag, THTensor *r_)
 {
-  long *dim;
-  int i;
+  THLongStorage *dim;
 
   THArgCheck(dimension >= 0 && dimension < THTensor_(nDimension)(t), 3, "invalid dimension");
 
-  dim = THAlloc(sizeof(long)*THTensor_(nDimension)(t));
-  for(i = 0; i < THTensor_(nDimension)(t); i++)
-    dim[i] = THTensor_(size)(t, i);
-  dim[dimension] = 1;
-  THTensor_(resize)(r_, THTensor_(nDimension)(t), dim);
-  THFree(dim);
+  dim = THTensor_(newSizeOf)(t);
+  THLongStorage_set(dim, dimension, 1);
+  THTensor_(resize)(r_, dim);
+  THLongStorage_free(dim);
 
   TH_GEN_TENSOR_DIM_APPLY2(t, r_, dimension,
                            real sum = 0;
@@ -629,15 +607,15 @@ void THLab_(logspace)(real a, real b, long n, THTensor *r_)
   TH_TENSOR_APPLY(r_, r__data[i] = pow(10.0, a + ((real)i)*(b-a)/((real)(n-1))););
 }
 
-void THLab_(rand)(int nDimension, long *size, THTensor *r_)
+void THLab_(rand)(THLongStorage *size, THTensor *r_)
 {
-  THTensor_(resize)(r_, nDimension, size);
+  THTensor_(resize)(r_, size);
   THTensor_(uniform)(r_, 0, 1);
 }
 
-void THLab_(randn)(int nDimension, long *size, THTensor *r_)
+void THLab_(randn)(THLongStorage *size, THTensor *r_)
 {
-  THTensor_(resize)(r_, nDimension, size);
+  THTensor_(resize)(r_, size);
   THTensor_(normal)(r_, 0, 1);
 }
 

@@ -28,6 +28,40 @@ THStorage* THStorage_(newWithSize)(long size)
   return self;
 }
 
+THStorage* THStorage_(newWithSize1)(real data0)
+{
+  THStorage *self = THStorage_(newWithSize)(1);
+  self->data[0] = data0;
+  return self;
+}
+
+THStorage* THStorage_(newWithSize2)(real data0, real data1)
+{
+  THStorage *self = THStorage_(newWithSize)(2);
+  self->data[0] = data0;
+  self->data[1] = data1;
+  return self;
+}
+
+THStorage* THStorage_(newWithSize3)(real data0, real data1, real data2)
+{
+  THStorage *self = THStorage_(newWithSize)(3);
+  self->data[0] = data0;
+  self->data[1] = data1;
+  self->data[2] = data2;
+  return self;
+}
+
+THStorage* THStorage_(newWithSize4)(real data0, real data1, real data2, real data3)
+{
+  THStorage *self = THStorage_(newWithSize)(3);
+  self->data[0] = data0;
+  self->data[1] = data1;
+  self->data[2] = data2;
+  self->data[3] = data3;
+  return self;
+}
+
 real* THStorage_(data)(THStorage *self)
 {
   return self->data;

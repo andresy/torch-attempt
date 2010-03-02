@@ -258,7 +258,7 @@ THLongStorage *THTensor_(newStrideOf)(THTensor *self)
 /* Resize */
 void THTensor_(resizeAs)(THTensor *self, THTensor *tensor)
 {
-  THLongStorage *size = THLongStorage_newWithData(self->size);
+  THLongStorage *size = THTensor_(newSizeOf)(tensor);
   THTensor_(resize)(self, size);
   THLongStorage_free(size);
 }
