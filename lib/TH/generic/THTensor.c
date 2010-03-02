@@ -14,7 +14,7 @@ struct THTensor
     int refcount;    
 };
 
-void THTensor_(resize)(THTensor *self, int nDimension, long *size)
+static void THTensor_(resize_raw)(THTensor *self, int nDimension, long *size)
 {
   int isSame = 0;
   int d;
@@ -63,7 +63,12 @@ void THTensor_(resize)(THTensor *self, int nDimension, long *size)
   }
 }
 
-void THTensor_(init)(THTensor *self, THStorage *storage, long storageOffset, int nDimension, long *size)
+void THTensor_(resize)(THTensor *self, THLongStorage *size)
+{
+  THTensor_(resize_raw)(self, (size ? THLongStorage_size(size) : 0), (size ? THLongStorage_data(size) : NULL));
+}
+
+static void THTensor_(init_raw)(THTensor *self, THStorage *storage, long storageOffset, int nDimension, long *size)
 {
   if(storage)
   {
@@ -81,14 +86,20 @@ void THTensor_(init)(THTensor *self, THStorage *storage, long storageOffset, int
   self->refcount = 1;
 
   if(nDimension > 0)
-    THTensor_(resize)(self, nDimension, size);
+    THTensor_(resize_raw)(self, nDimension, size);
+}
+
+void THTensor_(init)(THTensor *self, THStorage *storage, long storageOffset, THLongStorage *size)
+{
+  THTensor_(init_raw)(self, storage, storageOffset,
+                      (size ? THLongStorage_size(size) : 0), (size ? THLongStorage_data(size) : NULL));
 }
 
 /* Empty init */
 THTensor *THTensor_(new)(void)
 {
   THTensor* self = THAlloc(sizeof(THTensor));
-  THTensor_(init)(self, NULL, 0, 0, NULL);
+  THTensor_(init_raw)(self, NULL, 0, 0, NULL);
   return self;
 }
 
@@ -96,7 +107,7 @@ THTensor *THTensor_(new)(void)
 THTensor* THTensor_(newWithTensor)(THTensor *tensor)
 {
   THTensor* self = THAlloc(sizeof(THTensor));
-  THTensor_(init)(self, tensor->storage, tensor->storageOffset, tensor->nDimension, tensor->size);
+  THTensor_(init_raw)(self, tensor->storage, tensor->storageOffset, tensor->nDimension, tensor->size);
   return self;
 }
 
@@ -137,22 +148,20 @@ THTensor* THTensor_(newWithTensorSelect)(THTensor *tensor, long sliceIndex)
 }
 
 /* Storage init */
-THTensor *THTensor_(newWithStorage)(THStorage *storage, long storageOffset, int nDimension, long *size)
+THTensor *THTensor_(newWithStorage)(THStorage *storage, long storageOffset, THLongStorage *size)
 {
   THTensor* self = THAlloc(sizeof(THTensor));
-  THTensor_(init)(self, storage, storageOffset, nDimension, size);
+  THTensor_(init)(self, storage, storageOffset, size);
   return self;
 }
 
 THTensor *THTensor_(newWithStorage4d)(THStorage *storage, long storageOffset,
                                              long size0, long size1, long size2, long size3)
 {
-  long size[4];
-  size[0] = size0;
-  size[1] = size1;
-  size[2] = size2;
-  size[3] = size3;
-  return THTensor_(newWithStorage)(storage, storageOffset, 4, size);
+  THLongStorage *size = THLongStorage_newWithSize4(size0, size1, size2, size3);
+  THTensor *tensor = THTensor_(newWithStorage)(storage, storageOffset, size);
+  THLongStorage_free(size);
+  return tensor;
 }
 
 THTensor *THTensor_(newWithStorage1d)(THStorage *storage, long storageOffset,
@@ -175,21 +184,19 @@ THTensor *THTensor_(newWithStorage3d)(THStorage *storage, long storageOffset,
 
 
 /* Normal init */
-THTensor *THTensor_(newWithSize)(int nDimension, long *size)
+THTensor *THTensor_(newWithSize)(THLongStorage *size)
 {
   THTensor* self = THAlloc(sizeof(THTensor));
-  THTensor_(init)(self, NULL, 0, nDimension, size);
+  THTensor_(init)(self, NULL, 0, size);
   return self;
 }
 
 THTensor *THTensor_(newWithSize4d)(long size0, long size1, long size2, long size3)
 {
-  long size[4];
-  size[0] = size0;
-  size[1] = size1;
-  size[2] = size2;
-  size[3] = size3;
-  return THTensor_(newWithSize)(4, size);
+  THLongStorage *size = THLongStorage_newWithSize4(size0, size1, size2, size3);
+  THTensor *tensor = THTensor_(newWithSize)(size);
+  THLongStorage_free(size);
+  return tensor;
 }
 
 THTensor *THTensor_(newWithSize1d)(long size0)
@@ -251,17 +258,16 @@ THLongStorage *THTensor_(newStrideOf)(THTensor *self)
 /* Resize */
 void THTensor_(resizeAs)(THTensor *self, THTensor *tensor)
 {
-  THTensor_(resize)(self, tensor->nDimension, tensor->size);
+  THLongStorage *size = THLongStorage_newWithData(self->size);
+  THTensor_(resize)(self, size);
+  THLongStorage_free(size);
 }
 
 void THTensor_(resize4d)(THTensor *self, long size0, long size1, long size2, long size3)
 {
-  long size[4];
-  size[0] = size0;
-  size[1] = size1;
-  size[2] = size2;
-  size[3] = size3;
-  THTensor_(resize)(self, 4, size);
+  THLongStorage *size = THLongStorage_newWithSize4(size0, size1, size2, size3);
+  THTensor_(resize)(self, size);
+  THLongStorage_free(size);
 }
 
 void THTensor_(resize1d)(THTensor *self, long size0)
