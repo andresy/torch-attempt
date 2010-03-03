@@ -425,19 +425,21 @@ const char *luaT_classmodulename(const char *tname)
 
 void luaT_registeratid(lua_State *L, const struct luaL_Reg *methods, const void *id)
 {
-  luaL_checktype(L, 1, LUA_TTABLE);
+  int idx = lua_gettop(L);
+
+  luaL_checktype(L, idx, LUA_TTABLE);
   lua_pushlightuserdata(L, (void*)id);
-  lua_rawget(L, 1);
-  
+  lua_rawget(L, idx);
+
   if(lua_isnil(L, -1))
   {
     lua_pop(L, 1);
     lua_pushlightuserdata(L, (void*)id);
     lua_newtable(L);
-    lua_rawset(L, 1);
+    lua_rawset(L, idx);
 
     lua_pushlightuserdata(L, (void*)id);
-    lua_rawget(L, 1);
+    lua_rawget(L, idx);
   }
 
   luaL_register(L, NULL, methods);

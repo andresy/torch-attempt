@@ -2,27 +2,58 @@
 #define TH_GENERIC_FILE "generic/lab.c"
 #else
 
-static const void* torch_(Tensor_id);
-static const void* torch_LongStorage_id;
-
-static int lab_(rand)(lua_State *L)
+static int lab_(max_)(lua_State *L)
 {
-  THLongStorage *dimension = lab_checklongargs(L, 1);
-  THTensor *t = THTensor_(new)();
-  luaT_pushudata(L, t, torch_(Tensor_id));
-  THLab_(rand)(dimension, t);
+  THTensor *values_ = luaT_checkudata(L, 1, torch_(Tensor_id));
+  THLongTensor *indices_ = luaT_checkudata(L, 2, torch_LongTensor_id);
+  THTensor *t = luaT_checkudata(L, 3, torch_(Tensor_id));
+  int dimension = (int)(luaL_optnumber(L, 4, 1))-1;
 
-  lua_getfield(L, LUA_GLOBALSINDEX, "print");
-  THLongStorage_retain(dimension);
-  luaT_pushudata(L, dimension, torch_LongStorage_id);
-  lua_call(L, 1, 0);
+  THLab_(max)(t, dimension, values_, indices_);
+  THLongTensor_add(indices_, 1);
 
-  THLongStorage_free(dimension);
+  lua_settop(L, 2);  
+  return 2;
+}
+
+static int lab_(max)(lua_State *L)
+{
+  luaT_pushudata(L, THTensor_(new)(), torch_(Tensor_id));
+  lua_insert(L, 1);
+  luaT_pushudata(L, THLongTensor_new(), torch_LongTensor_id);
+  lua_insert(L, 2);
+  return lab_(max_)(L);
+}
+
+#if defined(TH_REAL_IS_FLOAT) || defined(TH_REAL_IS_DOUBLE)
+
+static int lab_(rand_)(lua_State *L)
+{
+  THTensor *r_ = luaT_checkudata(L, 1, torch_(Tensor_id));
+  THLongStorage *dimension = lab_checklongargs(L, 2);
+
+  THLab_(rand)(dimension, r_);
+
+  lua_settop(L, 1);  
   return 1;
 }
 
+static int lab_(rand)(lua_State *L)
+{
+  luaT_pushudata(L, THTensor_(new)(), torch_(Tensor_id));
+  lua_insert(L, 1);
+  return lab_(rand_)(L);
+}
+
+#endif
+
 static const struct luaL_Reg lab_(stuff__) [] = {
-  {"rand_", lab_(rand)},
+  {"max_", lab_(max_)},
+  {"max", lab_(max)},
+#if defined(TH_REAL_IS_FLOAT) || defined(TH_REAL_IS_DOUBLE)
+  {"rand_", lab_(rand_)},
+  {"rand", lab_(rand)},
+#endif
   {NULL, NULL}
 };
 

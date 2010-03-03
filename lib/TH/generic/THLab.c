@@ -31,7 +31,7 @@ void THLab_(max)(THTensor *t, int dimension, THTensor *values_, THLongTensor *in
                            theMax = t_data[i*t_stride];
                          }
                        }
-                       *indices__data = theIndex+1;
+                       *indices__data = theIndex;
                        *values__data = theMax;);  
 
 }
@@ -60,7 +60,7 @@ void THLab_(min)(THTensor *t, int dimension, THTensor *values_, THLongTensor *in
                            theMin = t_data[i*t_stride];
                          }
                        }
-                       *indices__data = theIndex+1;
+                       *indices__data = theIndex;
                        *values__data = theMin;);  
 
 }
