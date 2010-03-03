@@ -30,7 +30,7 @@ void lab_(init)(lua_State *L)
 {
   torch_(Tensor_id) = luaT_checktypename2id(L, torch_string_(Tensor));
   torch_LongStorage_id = luaT_checktypename2id(L, "torch.LongStorage");
-  luaL_register(L, NULL, lab_(stuff__));
+  luaT_registeratid(L, lab_(stuff__), torch_(Tensor_id));
 }
 
 #endif

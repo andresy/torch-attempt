@@ -72,6 +72,7 @@ LUAT_API const char *luaT_classmodulename(const char *tname);
 LUAT_API void luaT_stackdump(lua_State *L);
 
 LUAT_API void luaT_registeratid(lua_State *L, const struct luaL_Reg *methods, const void *id);
+LUAT_API void luaT_registerfromid(lua_State *L, const void *id);
 
 /* Lua functions */
 
@@ -85,5 +86,6 @@ LUAT_API int luaT_lua_getenv(lua_State *L);
 LUAT_API int luaT_lua_getmetatable(lua_State *L);
 LUAT_API int luaT_lua_version(lua_State *L);
 LUAT_API int luaT_lua_setmetatable(lua_State *L);
+LUAT_API int luaT_lua_typename2id(lua_State *L);
 
 #endif

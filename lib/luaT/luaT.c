@@ -979,3 +979,13 @@ int luaT_cmt__newindex(lua_State *L)
   return 0;
 }
 
+int luaT_lua_typename2id(lua_State *L)
+{
+  const char* typename = luaL_checkstring(L, 1);
+  const void* id = luaT_typename2id(L, typename);
+  if(id)
+    lua_pushlightuserdata(L, (void*)id);
+  else
+    lua_pushnil(L);
+  return 1;
+}

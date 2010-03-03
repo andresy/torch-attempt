@@ -23,4 +23,6 @@ void torch_utils_init(lua_State *L)
   lua_setfield(L, -2, "version");
   lua_pushcfunction(L, luaT_lua_pointer);
   lua_setfield(L, -2, "pointer");
+  lua_pushcfunction(L, luaT_lua_typename2id);
+  lua_setfield(L, -2, "typename2id");
 }
