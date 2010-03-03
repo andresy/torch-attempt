@@ -162,6 +162,7 @@ static int lab_(zeros_)(lua_State *L)
 
   THLab_(zeros)(r_, dimension);
 
+  THLongStorage_free(dimension);
   lua_settop(L, 1);  
   return 1;
 }
@@ -180,6 +181,7 @@ static int lab_(ones_)(lua_State *L)
 
   THLab_(ones)(r_, dimension);
 
+  THLongStorage_free(dimension);
   lua_settop(L, 1);  
   return 1;
 }
@@ -276,6 +278,7 @@ static int lab_(reshape_)(lua_State *L)
 
   THLab_(reshape)(r_, t, dimension);
 
+  THLongStorage_free(dimension);
   lua_settop(L, 1);  
   return 1;
 }
@@ -482,6 +485,7 @@ static int lab_(rand_)(lua_State *L)
 
   THLab_(rand)(r_, dimension);
 
+  THLongStorage_free(dimension);
   lua_settop(L, 1);  
   return 1;
 }
@@ -500,6 +504,7 @@ static int lab_(randn_)(lua_State *L)
 
   THLab_(randn)(r_, dimension);
 
+  THLongStorage_free(dimension);
   lua_settop(L, 1);  
   return 1;
 }

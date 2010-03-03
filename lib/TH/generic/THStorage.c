@@ -54,7 +54,7 @@ THStorage* THStorage_(newWithSize3)(real data0, real data1, real data2)
 
 THStorage* THStorage_(newWithSize4)(real data0, real data1, real data2, real data3)
 {
-  THStorage *self = THStorage_(newWithSize)(3);
+  THStorage *self = THStorage_(newWithSize)(4);
   self->data[0] = data0;
   self->data[1] = data1;
   self->data[2] = data2;
