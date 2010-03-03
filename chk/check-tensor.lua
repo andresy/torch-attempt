@@ -313,9 +313,9 @@ if torch.typename(z) == 'torch.DoubleTensor' or torch.typename(z) == 'torch.Floa
    end
 
    checkbasicstat('log', math.log)
---    checkbasicstat('log1p', function(z)
---                             return math.log(1+z)
---                          end)
+   checkbasicstat('log1p', function(z)
+                            return math.log(1+z)
+                         end)
    checkbasicstat('exp', math.exp)
    checkbasicstat('cos', math.cos)
    checkbasicstat('acos', math.acos)

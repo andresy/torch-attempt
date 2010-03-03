@@ -7,7 +7,7 @@ ENDIF(NOT CMAKE_BUILD_TYPE)
 # When using gcc
 IF(CMAKE_COMPILER_IS_GNUCC)
   # we want warnings
-  ADD_DEFINITIONS("-Wall -ansi -pedantic")
+  ADD_DEFINITIONS("-Wall")
   # we want exceptions support even when compiling c code
   ADD_DEFINITIONS("-fexceptions")
 ENDIF(CMAKE_COMPILER_IS_GNUCC)
